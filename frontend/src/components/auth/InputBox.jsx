@@ -11,7 +11,7 @@ const InputBox = ({ name, type, id, value, placeholder, icon }) => {
                 placeholder={placeholder}
                 defaultValue={value}
                 id={id}
-                className="input-box capitalize "
+                className="input-box"
             />
 
             {/* Input Icon */}
