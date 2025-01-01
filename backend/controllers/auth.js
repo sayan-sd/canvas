@@ -1,19 +1,23 @@
-process.emitWarning = () => {};
+process.emitWarning = () => { };
+
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const { getAuth } = require("firebase-admin/auth");
-
-const generateUserName = require("./helper/authHelper/generateUserName");
-const { formatData } = require("./helper/authHelper/formatData");
 
 const User = require("../models/User");
 const OTP = require("../models/Otp");
-const { generateOTP, generateEmailTemplate } = require("../utils/otpUtils");
+
+const { getAuth } = require("firebase-admin/auth");
 const mailSender = require("../utils/mailSender");
+
+const generateUserName = require("./helper/authHelper/generateUserName");
+const { formatData } = require("./helper/authHelper/formatData");
+const { generateOTP, generateEmailTemplate } = require("../utils/otpUtils");
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
+
+// send otp to user
 exports.sendOTP = async (req, res) => {
     try {
         const { email } = req.body;
@@ -56,6 +60,8 @@ exports.sendOTP = async (req, res) => {
     }
 };
 
+
+// verify otp and create user
 exports.verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -96,6 +102,7 @@ exports.verifyOTP = async (req, res) => {
         });
     }
 };
+
 
 // Sign up
 exports.signUp = async (req, res) => {
@@ -186,6 +193,7 @@ exports.signUp = async (req, res) => {
     }
 };
 
+
 // Login
 exports.signIn = async (req, res) => {
     try {
@@ -231,6 +239,8 @@ exports.signIn = async (req, res) => {
     }
 };
 
+
+// Google Authetication (firebase)
 exports.googleAuth = async (req, res) => {
     try {
         const { access_token } = req.body;
@@ -239,14 +249,18 @@ exports.googleAuth = async (req, res) => {
             return res.status(400).json({ message: "Token is missing" });
         }
 
+        // get user details if token match
         const decodedUser = await getAuth().verifyIdToken(access_token);
-        const { email, name, picture: rawPicture } = decodedUser;
+        const { email, name} = decodedUser;
 
+        // check user in db
         let user = await User.findOne({ "personal_info.email": email }).select(
             "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
         );
 
+        // login (user present)
         if (user) {
+            // not login with google
             if (!user.google_auth) {
                 return res.status(403).json({
                     success: false,
@@ -255,6 +269,7 @@ exports.googleAuth = async (req, res) => {
                 });
             }
 
+            // log in with google
             return res.status(200).json({
                 success: true,
                 message: "User successfully logged in",
@@ -290,10 +305,12 @@ exports.googleAuth = async (req, res) => {
 };
 
 
-
+// forget password
 exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
+
+        // Check if user exists
         const user = await User.findOne({ "personal_info.email": email });
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
@@ -307,11 +324,13 @@ exports.forgotPassword = async (req, res) => {
             });
         }
 
+        // genetate random token to login
         const token = crypto.randomBytes(32).toString("hex");
         user.resetToken = token;
-        user.tokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+        user.tokenExpiry = Date.now() + 3600000; // token valid for 1 hr
         await user.save();
 
+        // send mail with reset link
         const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
         await mailSender(email, "Password Reset", `Click here to reset your password: ${resetLink}`);
         
@@ -321,15 +340,20 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
+
+// match token and reset password
 exports.resetPassword = async (req, res) => {
     try {
         const { password, token } = req.body;
+
+        // check for the token
         const user = await User.findOne({ resetToken: token, tokenExpiry: { $gt: Date.now() } });
 
         if (!user) {
             return res.status(400).json({ success: false, message: "Invalid or expired token." });
         }
 
+        // update password
         user.personal_info.password = await bcrypt.hash(password, 10);
         user.resetToken = undefined;
         user.tokenExpiry = undefined;

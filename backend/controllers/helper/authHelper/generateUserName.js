@@ -1,5 +1,6 @@
 const User = require('../../../models/User');
 
+// function to generate unique username
 const generateUserName = async (email) => {
     try {
         const { nanoid } = await import('nanoid');
