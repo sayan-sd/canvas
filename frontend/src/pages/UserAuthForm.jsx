@@ -174,13 +174,13 @@ const UserAuthForm = ({ type }) => {
             return toast.error("Invalid email address");
         }
 
+        toast.success("Reset password link sent to your email.");
         try {
+            navigate("/");
             await axios.post(
                 `${import.meta.env.VITE_SERVER_DOMAIN}/forgot-password`,
                 { email }
             );
-            toast.success("Reset password link sent to your email.");
-            navigate("/signin");
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Error sending reset link."

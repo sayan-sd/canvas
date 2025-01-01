@@ -298,6 +298,14 @@ exports.forgotPassword = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
+        // Check if the user is authenticated via Google
+        if (user.google_auth) {
+            return res.status(403).json({
+                success: false,
+                message: "Please use Google authentication to log in."
+            });
+        }
+
         const token = crypto.randomBytes(32).toString("hex");
         user.resetToken = token;
         user.tokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
