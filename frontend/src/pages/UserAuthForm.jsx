@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import InputBox from "../components/auth/InputBox";
 import gooleIcon from "../assets/google.png";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import PageAnimationWrapper from "../components/common/PageAnimation";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -16,6 +16,7 @@ const UserAuthForm = ({ type }) => {
     const [otpSent, setOtpSent] = useState(false);
     const [formData, setFormData] = useState({});
     let accessToken = userAuth?.access_token;
+    const navigate = useNavigate();
 
     const sendOTP = async (email) => {
         try {
@@ -146,9 +147,44 @@ const UserAuthForm = ({ type }) => {
             // console.log(data)
             storeInSession("user", JSON.stringify(data.data));
             setUserAuth(data.data);
-            
         } catch (error) {
-            toast.error("Can't connect to Google, try another method");
+            const errorMessage =
+                error.response?.data?.message ||
+                "Can't connect to Google, try another method";
+            toast.error(errorMessage);
+        }
+    };
+
+    const handleForgetPassword = async (e) => {
+        e.preventDefault();
+
+        // Access the closest form and the email input field
+        const form = e.target.closest("form");
+        const emailInput = form?.elements["email"]; // Find the input with name="email"
+
+        if (!emailInput || !emailInput.value) {
+            return toast.error("Email is required");
+        }
+
+        const email = emailInput.value;
+
+        // Validate email format
+        let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (!emailRegex.test(email)) {
+            return toast.error("Invalid email address");
+        }
+
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_SERVER_DOMAIN}/forgot-password`,
+                { email }
+            );
+            toast.success("Reset password link sent to your email.");
+            navigate("/signin");
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Error sending reset link."
+            );
         }
     };
 
@@ -188,6 +224,18 @@ const UserAuthForm = ({ type }) => {
                                 icon="key"
                                 disabled={showOtpInput}
                             />
+
+                            {/* forget pass */}
+                            {type == "sign-in" && (
+                                <p className="mt-6 text-dark-grey text-xl text-right">
+                                    <button
+                                        onClick={handleForgetPassword}
+                                        className="underline text-black ml-1"
+                                    >
+                                        Forgot Password?
+                                    </button>
+                                </p>
+                            )}
                         </>
                     )}
 
@@ -204,7 +252,7 @@ const UserAuthForm = ({ type }) => {
                         {type == "sign-in"
                             ? "Login"
                             : showOtpInput
-                            ? "Verify & Sign Up"
+                            ? "Sign Up"
                             : "Send OTP"}
                     </button>
 

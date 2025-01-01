@@ -3,6 +3,7 @@ import Navbar from "./components/common/Navbar";
 import UserAuthForm from "./pages/UserAuthForm";
 import { createContext, useEffect, useState } from "react";
 import { lookInSession } from "./components/common/session";
+import ResetPassword from "./components/auth/ResetPassword";
 
 export const UserContext = createContext({});
 
@@ -28,6 +29,7 @@ function App() {
                         path="/signup"
                         element={<UserAuthForm type={"sign-up"} />}
                     />
+                    <Route path="/reset-password/:token" element={<ResetPassword/>} />
                 </Route>
             </Routes>
         </UserContext.Provider>

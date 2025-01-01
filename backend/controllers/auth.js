@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const { getAuth } = require("firebase-admin/auth");
 
 const generateUserName = require("./helper/authHelper/generateUserName");
@@ -287,3 +288,46 @@ exports.googleAuth = async (req, res) => {
     }
 };
 
+
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ "personal_info.email": email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const token = crypto.randomBytes(32).toString("hex");
+        user.resetToken = token;
+        user.tokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+        await user.save();
+
+        const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
+        await mailSender(email, "Password Reset", `Click here to reset your password: ${resetLink}`);
+        
+        res.status(200).json({ success: true, message: "Password reset link sent." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error." });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { password, token } = req.body;
+        const user = await User.findOne({ resetToken: token, tokenExpiry: { $gt: Date.now() } });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: "Invalid or expired token." });
+        }
+
+        user.personal_info.password = await bcrypt.hash(password, 10);
+        user.resetToken = undefined;
+        user.tokenExpiry = undefined;
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Password reset successful." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error." });
+    }
+};
