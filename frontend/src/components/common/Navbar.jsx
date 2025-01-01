@@ -62,6 +62,7 @@ const Navbar = () => {
                         <i className="fi fi-rr-file-edit"></i>
                     </Link>
 
+                    {/* dashboard for logged in user */}
                     {accesss_token ? (
                         <>
                             <Link to={"/dashboard/notification"}>

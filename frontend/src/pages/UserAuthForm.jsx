@@ -1,23 +1,29 @@
 import React, { useContext, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import toast from "react-hot-toast";
 import InputBox from "../components/auth/InputBox";
 import gooleIcon from "../assets/google.png";
-import { Link, Navigate, useNavigate } from "react-router-dom";
 import PageAnimationWrapper from "../components/common/PageAnimation";
-import toast from "react-hot-toast";
-import axios from "axios";
+import OtpInput from "../components/auth/OtpInput";
+
 import { storeInSession } from "../components/common/session";
 import { UserContext } from "../App";
-import OtpInput from "../components/auth/OtpInput";
 import { authWithGoogle } from "../components/auth/Firebase";
 
 const UserAuthForm = ({ type }) => {
     let { userAuth, setUserAuth } = useContext(UserContext);
+
     const [showOtpInput, setShowOtpInput] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
     const [formData, setFormData] = useState({});
-    let accessToken = userAuth?.access_token;
+
     const navigate = useNavigate();
 
+    let accessToken = userAuth?.access_token;
+
+    // send otp request
     const sendOTP = async (email) => {
         try {
             await axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/send-otp", {
@@ -26,14 +32,14 @@ const UserAuthForm = ({ type }) => {
             toast.success("OTP sent to your email!");
             setOtpSent(true);
         } catch (error) {
-            setShowOtpInput(false); // Hide OTP input if sending fails
+            setShowOtpInput(false);
             toast.error(error.response?.data?.message || "Failed to send OTP");
         }
     };
 
     const handleOtpComplete = async (otp) => {
         try {
-            // First verify OTP
+            // if verify OTP 
             await axios.post(
                 import.meta.env.VITE_SERVER_DOMAIN + "/verify-otp",
                 {
@@ -42,7 +48,7 @@ const UserAuthForm = ({ type }) => {
                 }
             );
 
-            // Then proceed with signup
+            // then proceed with signup
             const { data } = await axios.post(
                 import.meta.env.VITE_SERVER_DOMAIN + "/signup",
                 formData
@@ -57,6 +63,7 @@ const UserAuthForm = ({ type }) => {
         }
     };
 
+    // on submit form
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -115,11 +122,11 @@ const UserAuthForm = ({ type }) => {
                 return;
             }
 
-            // For sign-up, show OTP input first, then send OTP
+            // in sign-up sent otp then generate otp box
+            await sendOTP(email);
             setFormData(newFormData);
             setShowOtpInput(true);
-            // Send OTP after state updates
-            setTimeout(() => sendOTP(email), 0);
+            // setTimeout(() => sendOTP(email), 0);
             return;
         }
 
@@ -158,7 +165,7 @@ const UserAuthForm = ({ type }) => {
     const handleForgetPassword = async (e) => {
         e.preventDefault();
 
-        // Access the closest form and the email input field
+        // take email 
         const form = e.target.closest("form");
         const emailInput = form?.elements["email"]; // Find the input with name="email"
 
@@ -198,6 +205,7 @@ const UserAuthForm = ({ type }) => {
                         {type == "sign-in" ? "Welcome back" : "Join us today"}
                     </h1>
 
+                    {/* name field for sign up */}
                     {!showOtpInput && (
                         <>
                             {type != "sign-in" && (
@@ -239,6 +247,7 @@ const UserAuthForm = ({ type }) => {
                         </>
                     )}
 
+                    {/* otp box */}
                     {showOtpInput && (
                         <>
                             <OtpInput name="otp" />
@@ -248,6 +257,7 @@ const UserAuthForm = ({ type }) => {
                         </>
                     )}
 
+                    {/* cta button */}
                     <button className="btn-dark center mt-14" type="submit">
                         {type == "sign-in"
                             ? "Login"
@@ -262,6 +272,7 @@ const UserAuthForm = ({ type }) => {
                         <hr className="w-1/2 border-black" />
                     </div>
 
+                    {/* google auth button */}
                     <button
                         type="button"
                         className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
@@ -275,6 +286,7 @@ const UserAuthForm = ({ type }) => {
                         continue with Google
                     </button>
 
+                    {/* toogle sign method */}
                     {type == "sign-in" ? (
                         <p className="mt-6 text-dark-grey text-xl text-center">
                             Don't have an account?{" "}

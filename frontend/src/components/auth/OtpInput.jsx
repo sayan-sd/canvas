@@ -9,16 +9,15 @@ const OtpInput = ({ name = "otp" }) => {
         if (isNaN(value)) return;
 
         const newOtp = [...otp];
-        // Only take the last character if multiple characters are pasted/entered
         newOtp[index] = value.substring(value.length - 1);
         setOtp(newOtp);
 
-        // If a number is entered, move to next input
+        // move to next inp box
         if (value && index < 5) {
             inputRefs.current[index + 1].focus();
         }
 
-        // Update hidden input with complete OTP value
+        // ppdate hidden input with complete otp
         const hiddenInput = document.querySelector(`input[name="${name}"]`);
         if (hiddenInput) {
             hiddenInput.value = newOtp.join("");
@@ -26,7 +25,7 @@ const OtpInput = ({ name = "otp" }) => {
     };
 
     const handleKeyDown = (index, e) => {
-        // Move to previous input on backspace if current input is empty
+        // previous box if press backspace
         if (e.key === "Backspace" && !otp[index] && index > 0) {
             inputRefs.current[index - 1].focus();
             // Clear current input
@@ -76,7 +75,7 @@ const OtpInput = ({ name = "otp" }) => {
                     />
                 ))}
             </div>
-            {/* Hidden input to store complete OTP value */}
+            {/* store complete otp in case of paste */}
             <input type="hidden" name={name} />
         </div>
     );

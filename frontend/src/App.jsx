@@ -12,7 +12,7 @@ function App() {
 
     useEffect(() => {
         let userInSesstion = lookInSession("user");
-        userInSesstion
+        !userInSesstion == undefined
             ? setUserAuth(JSON.parse(userInSesstion))
             : setUserAuth({ access_token: null });
     }, []);
