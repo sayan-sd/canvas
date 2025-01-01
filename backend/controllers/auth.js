@@ -1,3 +1,4 @@
+process.emitWarning = () => {};
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const { getAuth } = require("firebase-admin/auth");
