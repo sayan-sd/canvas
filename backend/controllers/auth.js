@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const { getAuth } = require("firebase-admin/auth");
 
 const generateUserName = require("./helper/authHelper/generateUserName");
 const { formatData } = require("./helper/authHelper/formatData");
@@ -196,6 +197,13 @@ exports.signIn = async (req, res) => {
                 .json({ success: false, message: "User not found" });
         }
 
+        if (user.google_auth) {
+            return res.status(403).json({
+                success: false,
+                message: "Try logging in with your Google account",
+            });
+        }
+
         // compare password
         const isValidPassword = await bcrypt.compare(
             password,
@@ -208,13 +216,11 @@ exports.signIn = async (req, res) => {
                 .json({ success: false, message: "Incorrect password" });
         }
 
-        return res
-            .status(200)
-            .json({
-                success: true,
-                message: "User successfully logged in",
-                data: formatData(user),
-            });
+        return res.status(200).json({
+            success: true,
+            message: "User successfully logged in",
+            data: formatData(user),
+        });
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -222,3 +228,62 @@ exports.signIn = async (req, res) => {
         });
     }
 };
+
+exports.googleAuth = async (req, res) => {
+    try {
+        const { access_token } = req.body;
+
+        if (!access_token) {
+            return res.status(400).json({ message: "Token is missing" });
+        }
+
+        const decodedUser = await getAuth().verifyIdToken(access_token);
+        const { email, name, picture: rawPicture } = decodedUser;
+
+        let user = await User.findOne({ "personal_info.email": email }).select(
+            "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
+        );
+
+        if (user) {
+            if (!user.google_auth) {
+                return res.status(403).json({
+                    success: false,
+                    message:
+                        "This login method is not available for the respective user.",
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: "User successfully logged in",
+                data: formatData(user),
+            });
+        }
+
+        // Sign up new user
+        const username = await generateUserName(email);
+        const newUser = new User({
+            personal_info: {
+                fullname: name,
+                email,
+                username,
+            },
+            google_auth: true,
+        });
+
+        const savedUser = await newUser.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "User successfully signed up and logged in",
+            data: formatData(savedUser),
+        });
+    } catch (error) {
+        console.error("Error in googleAuth:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+

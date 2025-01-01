@@ -5,6 +5,7 @@ const cors = require('cors');
 const homeRoutes = require('./routes/home.routes');
 
 const { connectToDB } = require('./config/connectToDB');
+const firebaseInit = require('./config/firebaseInitialize');
 
 require('dotenv').config();
 
@@ -12,6 +13,7 @@ require('dotenv').config();
 
 // connections
 connectToDB();
+firebaseInit();
 
 
 // Middleware

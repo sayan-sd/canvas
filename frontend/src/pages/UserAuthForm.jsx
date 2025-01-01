@@ -8,6 +8,7 @@ import axios from "axios";
 import { storeInSession } from "../components/common/session";
 import { UserContext } from "../App";
 import OtpInput from "../components/auth/OtpInput";
+import { authWithGoogle } from "../components/auth/Firebase";
 
 const UserAuthForm = ({ type }) => {
     let { userAuth, setUserAuth } = useContext(UserContext);
@@ -67,7 +68,7 @@ const UserAuthForm = ({ type }) => {
         const form = e.target;
         const formElements = form.elements;
         let newFormData = {};
-        
+
         for (let element of formElements) {
             if (element.name) {
                 newFormData[element.name] = element.value;
@@ -106,7 +107,9 @@ const UserAuthForm = ({ type }) => {
                     storeInSession("user", JSON.stringify(data.data));
                     setUserAuth(data.data);
                 } catch (error) {
-                    toast.error(error.response?.data?.message || "Sign in failed");
+                    toast.error(
+                        error.response?.data?.message || "Sign in failed"
+                    );
                 }
                 return;
             }
@@ -125,6 +128,27 @@ const UserAuthForm = ({ type }) => {
                 return toast.error("Please enter a valid 6-digit OTP");
             }
             handleOtpComplete(otp);
+        }
+    };
+
+    const handleGoogleAuth = async (e) => {
+        e.preventDefault();
+        try {
+            const user = await authWithGoogle();
+            // console.log(user)
+            let serverRoute = "/google-auth";
+            let formData = { access_token: user.access_token };
+
+            const { data } = await axios.post(
+                import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
+                formData
+            );
+            // console.log(data)
+            storeInSession("user", JSON.stringify(data.data));
+            setUserAuth(data.data);
+            
+        } catch (error) {
+            toast.error("Can't connect to Google, try another method");
         }
     };
 
@@ -176,10 +200,7 @@ const UserAuthForm = ({ type }) => {
                         </>
                     )}
 
-                    <button
-                        className="btn-dark center mt-14"
-                        type="submit"
-                    >
+                    <button className="btn-dark center mt-14" type="submit">
                         {type == "sign-in"
                             ? "Login"
                             : showOtpInput
@@ -193,9 +214,10 @@ const UserAuthForm = ({ type }) => {
                         <hr className="w-1/2 border-black" />
                     </div>
 
-                    <button 
+                    <button
                         type="button"
                         className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+                        onClick={handleGoogleAuth}
                     >
                         <img
                             src={gooleIcon}
