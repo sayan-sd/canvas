@@ -46,3 +46,6 @@ build/
 # OS-generated files
 Thumbs.db
 ehthumbs.db
+
+# files with sensitive information
+**/firebaseServiceAccKey.json
