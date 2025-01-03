@@ -1,11 +1,14 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 
-const homeRoutes = require('./routes/home.routes');
+const authRoutes = require('./routes/auth.routes');
+const editorRoutes = require('./routes/editor.routes');
 
 const { connectToDB } = require('./config/connectToDB');
 const firebaseInit = require('./config/firebaseInitialize');
+const { cloudinaryConnect } = require('./config/cloudinary');
 
 require('dotenv').config();
 
@@ -14,15 +17,18 @@ require('dotenv').config();
 // connections
 connectToDB();
 firebaseInit();
+cloudinaryConnect();
 
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(fileUpload({ useTempFiles: true, tempFileDir: "./temp/" }));
 
 
 // Routes
-app.use("/", homeRoutes);
+app.use("/", authRoutes);
+app.use("/editor", editorRoutes);
 
 
 
