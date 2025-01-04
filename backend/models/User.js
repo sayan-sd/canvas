@@ -116,7 +116,7 @@ const UserSchema = new Schema(
         },
         blogs: {
             type: [Schema.Types.ObjectId],
-            ref: "blogs",
+            ref: "Blog",
             default: [],
         },
         resetToken: { type: String, default: undefined },

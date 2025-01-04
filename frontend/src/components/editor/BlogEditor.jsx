@@ -1,28 +1,45 @@
 import React, { useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import PageAnimationWrapper from "../common/PageAnimation";
 import defaultBanner from "../../assets/blog banner.png";
 import { uploadImage } from "../../utils/uploadImage";
 import toast from "react-hot-toast";
 import { EditorContext } from "../../pages/Editor";
-import EditorJS from '@editorjs/editorjs'
-import { tools } from './BlogTools';
+import EditorJS from "@editorjs/editorjs";
+import { tools } from "./BlogTools";
+import axios from "axios";
+import { UserContext } from "../../App";
 
 const BlogEditor = () => {
-
     // blog context
-    let { blog, blog: {title, banner, content, tags, description}, setBlog, textEditor, setTextEditor, setEditorState } = useContext(EditorContext);
+    let {
+        blog,
+        blog: { title, banner, content, tags, des },
+        setBlog,
+        textEditor,
+        setTextEditor,
+        setEditorState,
+    } = useContext(EditorContext);
 
+    let { userAuth } = useContext(UserContext);
+    let access_token;
+    if (userAuth != null) {
+        access_token = userAuth.access_token;
+    }
+
+    const navigate = useNavigate();
 
     // create editor
     useEffect(() => {
-        setTextEditor(new EditorJS({
-            holder: 'textEditor',
-            data: content,
-            tools: tools,
-            placeholder: "Let's write an awesome story...",
-        }))
+        setTextEditor(
+            new EditorJS({
+                holder: "textEditor",
+                data: content,
+                tools: tools,
+                placeholder: "Let's write an awesome story...",
+            })
+        );
     }, []);
 
     // upload blog banner preview
@@ -47,7 +64,6 @@ const BlogEditor = () => {
             toast.dismiss(loadingToast);
             setBlog({ ...blog, banner: result.url });
             toast.success("Uploaded 👍");
-
         } else {
             toast.dismiss(loadingToast);
             return toast.error("Error uploading blog banner");
@@ -59,22 +75,22 @@ const BlogEditor = () => {
         if (e.key === "Enter") {
             e.preventDefault();
         }
-    }
+    };
 
     // chnage textarea height dynamically
     const handleTitleChange = (e) => {
         let input = e.target;
-        input.style.height = 'auto';
+        input.style.height = "auto";
         input.style.height = `${input.scrollHeight}px`;
 
-        setBlog({...blog, title: input.value});
-    }
+        setBlog({ ...blog, title: input.value });
+    };
 
     // default banner
     const handleError = (e) => {
         let img = e.target;
         img.src = defaultBanner;
-    }
+    };
 
     // on publish button click
     const handlePublishEvent = () => {
@@ -93,19 +109,77 @@ const BlogEditor = () => {
 
         // must have content
         if (textEditor.isReady) {
-            textEditor.save().then(data => {
-                if (data.blocks.length) {
-                    setBlog({...blog, content: data });
-                    setEditorState("publish");
-                }
-                else {
-                    toast.error("Please enter blog content");
-                }
-            }).catch((err) => {
-                toast.error("Error saving blog content");
-            })
+            textEditor
+                .save()
+                .then((data) => {
+                    if (data.blocks.length) {
+                        setBlog({ ...blog, content: data });
+                        setEditorState("publish");
+                    } else {
+                        toast.error("Please write some content");
+                    }
+                })
+                .catch((err) => {
+                    toast.error("Error saving blog content");
+                });
         }
-    }
+    };
+
+    // save blog as draft
+    const handleSaveDraft = (e) => {
+        if (e.target.className.includes("disable")) {
+            return;
+        }
+
+        // validate data
+        if (!title) {
+            return toast.error("Write a title to save it as draft");
+        }
+
+        // send data to server
+        let loadingToast = toast.loading("Saving as draft...");
+        e.target.classList.add("disable");
+
+        if (textEditor.isReady) {
+            textEditor.save().then((content) => {
+                const blogObj = {
+                    title,
+                    banner,
+                    des,
+                    tags,
+                    content,
+                    draft: true,
+                };
+
+                axios
+                    .post(
+                        import.meta.env.VITE_SERVER_DOMAIN +
+                            "/blogs/create-blog",
+                        blogObj,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${access_token}`,
+                            },
+                        }
+                    )
+                    .then(() => {
+                        e.target.classList.remove("disable");
+                        toast.dismiss(loadingToast);
+                        toast.success("Saved as Draft 👍");
+
+                        setTimeout(() => {
+                            navigate("/");
+                        }, 500);
+                    })
+                    .catch(({ response }) => {
+                        e.target.classList.remove("disable");
+                        toast.dismiss(loadingToast);
+
+                        return toast.error(response.data.message);
+                    });
+            });
+        }
+    };
 
     return (
         <>
@@ -123,8 +197,18 @@ const BlogEditor = () => {
 
                 {/* buttons - publish & draft */}
                 <div className="flex gap-4 ml-auto">
-                    <button className="btn-dark py-2" onClick={handlePublishEvent}>Publish</button>
-                    <button className="btn-light py-2">Save Draft</button>
+                    <button
+                        className="btn-dark py-2"
+                        onClick={handlePublishEvent}
+                    >
+                        Publish
+                    </button>
+                    <button
+                        className="btn-light py-2"
+                        onClick={handleSaveDraft}
+                    >
+                        Save Draft
+                    </button>
                 </div>
             </nav>
 
@@ -151,7 +235,6 @@ const BlogEditor = () => {
                             </label>
                         </div>
 
-                        
                         {/* Blog title */}
                         <textarea
                             defaultValue={title}
@@ -162,10 +245,9 @@ const BlogEditor = () => {
                         ></textarea>
 
                         <hr className="w-full opacity-10 my-5" />
-                        
+
                         {/* Blog content */}
                         <div id="textEditor" className="font-gelasio"></div>
-
                     </div>
                 </section>
             </PageAnimationWrapper>

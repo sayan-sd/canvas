@@ -16,6 +16,7 @@ dist-ssr/
 
 # Temporary files
 tmp/
+temp/
 *.tmp
 
 # Environment variables

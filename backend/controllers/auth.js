@@ -2,6 +2,7 @@ process.emitWarning = () => { };
 
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const jwt = require('jsonwebtoken');
 
 const User = require("../models/User");
 const OTP = require("../models/Otp");
@@ -364,3 +365,25 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error." });
     }
 };
+
+
+
+// verify user token
+exports.verifyUser = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // validate token
+    if (token == null) {
+        return res.status(401).json({ success: false, message: "Unauthorized." });
+    }
+
+    // verify token
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ success: false, message: "Invalid token." });
+        }
+        req.user = user.id;
+        next();
+    })
+}
