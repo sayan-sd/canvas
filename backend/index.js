@@ -24,7 +24,7 @@ cloudinaryConnect();
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(fileUpload({ useTempFiles: true, tempFileDir: "./temp/" }));
+app.use(fileUpload({ useTempFiles: true, tempFileDir: "./tmp/" }));
 
 
 // Routes
