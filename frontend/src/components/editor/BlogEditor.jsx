@@ -1,13 +1,29 @@
-import React, { useRef } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import PageAnimationWrapper from "../common/PageAnimation";
 import defaultBanner from "../../assets/blog banner.png";
 import { uploadImage } from "../../utils/uploadImage";
 import toast from "react-hot-toast";
+import { EditorContext } from "../../pages/Editor";
+import EditorJS from '@editorjs/editorjs'
+import { tools } from './BlogTools';
 
 const BlogEditor = () => {
-    const blogBannerRef = useRef();
+
+    // blog context
+    let { blog, blog: {title, banner, content, tags, description}, setBlog, textEditor, setTextEditor, setEditorState } = useContext(EditorContext);
+
+
+    // create editor
+    useEffect(() => {
+        setTextEditor(new EditorJS({
+            holder: 'textEditor',
+            data: content,
+            tools: tools,
+            placeholder: "Let's write an awesome story...",
+        }))
+    }, []);
 
     // upload blog banner preview
     const handleBannerUpload = async (event) => {
@@ -29,14 +45,67 @@ const BlogEditor = () => {
 
         if (result.success) {
             toast.dismiss(loadingToast);
-            blogBannerRef.current.src = result.url;
+            setBlog({ ...blog, banner: result.url });
             toast.success("Uploaded 👍");
-        }
-        else {
+
+        } else {
             toast.dismiss(loadingToast);
             return toast.error("Error uploading blog banner");
         }
     };
+
+    // prevent multi line title
+    const handleTitleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+        }
+    }
+
+    // chnage textarea height dynamically
+    const handleTitleChange = (e) => {
+        let input = e.target;
+        input.style.height = 'auto';
+        input.style.height = `${input.scrollHeight}px`;
+
+        setBlog({...blog, title: input.value});
+    }
+
+    // default banner
+    const handleError = (e) => {
+        let img = e.target;
+        img.src = defaultBanner;
+    }
+
+    // on publish button click
+    const handlePublishEvent = () => {
+        // === validate data ===
+        // must have a blog banner
+        if (!banner.length) {
+            toast.error("Please upload a blog banner");
+            return;
+        }
+
+        // must have a title
+        if (!title.length) {
+            toast.error("Please enter a blog title");
+            return;
+        }
+
+        // must have content
+        if (textEditor.isReady) {
+            textEditor.save().then(data => {
+                if (data.blocks.length) {
+                    setBlog({...blog, content: data });
+                    setEditorState("publish");
+                }
+                else {
+                    toast.error("Please enter blog content");
+                }
+            }).catch((err) => {
+                toast.error("Error saving blog content");
+            })
+        }
+    }
 
     return (
         <>
@@ -49,12 +118,12 @@ const BlogEditor = () => {
 
                 {/* blog title */}
                 <p className="max-md:hidden text-black line-clamp-1 w-full">
-                    New Blog
+                    {title.length ? title : "New Blog"}
                 </p>
 
                 {/* buttons - publish & draft */}
                 <div className="flex gap-4 ml-auto">
-                    <button className="btn-dark py-2">Publish</button>
+                    <button className="btn-dark py-2" onClick={handlePublishEvent}>Publish</button>
                     <button className="btn-light py-2">Save Draft</button>
                 </div>
             </nav>
@@ -67,10 +136,10 @@ const BlogEditor = () => {
                         <div className="relative aspect-video bg-white border-4 border-grey hover:opacity-80">
                             <label htmlFor="uploadBanner">
                                 <img
-                                    ref={blogBannerRef}
                                     className="z-20 object-cover w-full h-full cursor-alias"
-                                    src={defaultBanner}
+                                    src={banner}
                                     alt="Blog Banner"
+                                    onError={handleError}
                                 />
                                 <input
                                     type="file"
@@ -81,6 +150,22 @@ const BlogEditor = () => {
                                 />
                             </label>
                         </div>
+
+                        
+                        {/* Blog title */}
+                        <textarea
+                            defaultValue={title}
+                            placeholder="Blog Title"
+                            className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40"
+                            onKeyDown={handleTitleKeyDown}
+                            onChange={handleTitleChange}
+                        ></textarea>
+
+                        <hr className="w-full opacity-10 my-5" />
+                        
+                        {/* Blog content */}
+                        <div id="textEditor" className="font-gelasio"></div>
+
                     </div>
                 </section>
             </PageAnimationWrapper>
