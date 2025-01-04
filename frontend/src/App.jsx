@@ -4,6 +4,7 @@ import UserAuthForm from "./pages/UserAuthForm";
 import { createContext, useEffect, useState } from "react";
 import { lookInSession } from "./components/common/session";
 import ResetPassword from "./components/auth/ResetPassword";
+import Editor from "./pages/Editor";
 
 export const UserContext = createContext({});
 
@@ -12,14 +13,19 @@ function App() {
 
     useEffect(() => {
         let userInSesstion = lookInSession("user");
-        !userInSesstion == undefined
-            ? setUserAuth(JSON.parse(userInSesstion))
-            : setUserAuth({ access_token: null });
+        if (userInSesstion !== null) {
+            setUserAuth(JSON.parse(userInSesstion));
+        } else {
+            setUserAuth({ access_token: null });
+        }
     }, []);
-
+    
     return (
         <UserContext.Provider value={{ userAuth, setUserAuth }}>
             <Routes>
+                {/* Write Blog Route */}
+                <Route path="/editor" element={<Editor />} />
+                
                 <Route path="/" element={<Navbar />}>
                     <Route
                         path="/signin"
