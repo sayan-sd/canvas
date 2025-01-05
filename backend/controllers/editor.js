@@ -54,7 +54,7 @@ exports.createBlog = async (req, res) => {
     
 
     // make tags lowercase
-    tags = tags.forEach((tag) => tag.toLowerCase());
+    tags = tags.map((tag) => tag.toLowerCase());
 
     // create a unique blog id (for later access)
     const blog_id =

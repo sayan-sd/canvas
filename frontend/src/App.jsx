@@ -5,6 +5,7 @@ import { createContext, useEffect, useState } from "react";
 import { lookInSession } from "./components/common/session";
 import ResetPassword from "./components/auth/ResetPassword";
 import Editor from "./pages/Editor";
+import HomePage from "./pages/HomePage";
 
 export const UserContext = createContext({});
 
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/editor" element={<Editor />} />
                 
                 <Route path="/" element={<Navbar />}>
+                    <Route index element={ <HomePage/> } />
                     <Route
                         path="/signin"
                         element={<UserAuthForm type={"sign-in"} />}
