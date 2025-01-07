@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import PageAnimationWrapper from "../common/PageAnimation";
 import toast from "react-hot-toast";
 import { EditorContext } from "../../pages/Editor";
@@ -26,6 +26,10 @@ const PublishBlogForm = () => {
     }
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const handleCloseEvent = () => {
         setEditorState("editor");

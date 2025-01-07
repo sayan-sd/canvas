@@ -21,7 +21,6 @@ const BlogEditor = () => {
         setTextEditor,
         setEditorState,
     } = useContext(EditorContext);
-
     let { userAuth } = useContext(UserContext);
     let access_token;
     if (userAuth != null) {
@@ -89,7 +88,14 @@ const BlogEditor = () => {
     // default banner
     const handleError = (e) => {
         let img = e.target;
-        img.src = defaultBanner;
+        // console.log(img);
+        
+        // Add a small timeout to ensure proper handling of the image state
+        setTimeout(() => {
+            if (!img.complete || img.naturalHeight === 0) {
+                img.src = defaultBanner;
+            }
+        }, 50);
     };
 
     // on publish button click
@@ -221,7 +227,7 @@ const BlogEditor = () => {
                             <label htmlFor="uploadBanner">
                                 <img
                                     className="z-20 object-cover w-full h-full cursor-alias"
-                                    src={banner}
+                                    src={blog ? banner : ""}
                                     alt="Blog Banner"
                                     onError={handleError}
                                 />

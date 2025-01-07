@@ -6,6 +6,7 @@ const fileUpload = require('express-fileupload');
 const authRoutes = require('./routes/auth.routes');
 const editorRoutes = require('./routes/editor.routes');
 const blogRoutes = require('./routes/blogs.routes');
+const userRoutes = require('./routes/users.routes');
 
 const { connectToDB } = require('./config/connectToDB');
 const firebaseInit = require('./config/firebaseInitialize');
@@ -31,6 +32,7 @@ app.use(fileUpload({ useTempFiles: true, tempFileDir: "./tmp/" }));
 app.use("/", authRoutes);
 app.use("/editor", editorRoutes);
 app.use("/blogs", blogRoutes);
+app.use("/users", userRoutes);
 
 
 
