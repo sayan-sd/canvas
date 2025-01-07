@@ -9,6 +9,8 @@ import Loader from "../components/common/Loader";
 import BlogPostCard from "../components/blog/BlogPostCard";
 import MinimalBlogPostCard from "../components/blog/MinimalBlogPostCard";
 import NoDataMessage from "../components/common/NoDataMessage";
+import { filterPaginationData } from "../components/home/FilterPaginationData";
+import LoadMoreDataBtn from "../components/common/LoadMoreDataBtn";
 
 const HomePage = () => {
     const [blogs, setBlogs] = useState(null);
@@ -27,11 +29,18 @@ const HomePage = () => {
     ];
 
     // latest blogs
-    const fetchLatestBlogs = async () => {
+    const fetchLatestBlogs = async ({page = 1}) => {
         axios
-            .get(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/latest-blogs")
-            .then(({ data }) => {
-                setBlogs(data.blogs);
+            .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/latest-blogs", {page})
+            .then(async ({ data }) => {
+                let formatedData = await filterPaginationData({
+                    state: blogs,
+                    data: data.blogs,
+                    page,
+                    countRoute: "/blogs/all-latest-blogs-count"
+                })
+                // console.log(formatedData);
+                setBlogs(formatedData);
             })
             .catch((err) => {
                 toast.error(err.message);
@@ -51,13 +60,21 @@ const HomePage = () => {
     };
 
     // blogs by category
-    const fetchBlogsByCategory = async () => {
+    const fetchBlogsByCategory = async ({page = 1}) => {
         axios
             .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/search-blogs", {
-                tag: pageState,
+                tag: pageState, page
             })
-            .then(({ data }) => {
-                setBlogs(data.blogs);
+            .then(async ({ data }) => {
+                let formatedData = await filterPaginationData({
+                    state: blogs,
+                    data: data.blogs,
+                    page,
+                    countRoute: "/blogs/search-blogs-count",
+                    data_to_send: {tag: pageState}
+                })
+
+                setBlogs(formatedData);
             })
             .catch((err) => {
                 toast.error(err.message);
@@ -69,9 +86,9 @@ const HomePage = () => {
         activeTabRef.current.click();
 
         if (pageState == "home") {
-            fetchLatestBlogs();
+            fetchLatestBlogs({page: 1});
         } else {
-            fetchBlogsByCategory();
+            fetchBlogsByCategory({page: 1});
         }
 
         if (!trendingBlogs) {
@@ -104,8 +121,8 @@ const HomePage = () => {
                         <>
                             {blogs == null ? (
                                 <Loader />
-                            ) : blogs.length ? (
-                                blogs.map((blog, i) => {
+                            ) : blogs.results.length ? (
+                                blogs.results.map((blog, i) => {
                                     return (
                                         <PageAnimationWrapper
                                             transition={{
@@ -126,6 +143,9 @@ const HomePage = () => {
                             ) : (
                                 <NoDataMessage message={"No blogs found"} />
                             )}
+
+                            {/* Load more button */}
+                            <LoadMoreDataBtn state={blogs} fetchDataFunc={(pageState == "home" ? fetchLatestBlogs : fetchBlogsByCategory)} />
                         </>
 
                         {/* trending blogs */}
