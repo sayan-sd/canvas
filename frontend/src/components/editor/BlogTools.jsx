@@ -55,7 +55,7 @@ export const tools = {
     embed: Embed,
     list: {
         class: List,
-        inlineToolbar: true
+        inlineToolbar: true,
     },
     image: {
         class: Image,
@@ -70,7 +70,7 @@ export const tools = {
         class: Header,
         config: {
             placeholder: "Enter Heading...",
-            levels: [2, 3, 4, 5, 6],
+            levels: [2, 3, 4],
             defaultLevel: 2
         }
     },

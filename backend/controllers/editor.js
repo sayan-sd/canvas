@@ -24,7 +24,7 @@ exports.uploadBlogImage = async (req, res) => {
 // create blog
 exports.createBlog = async (req, res) => {
     const authorId = req.user;
-    let { title, des, banner, tags, content, draft } = req.body;
+    let { title, des, banner, tags, content, draft, id } = req.body;
 
     // validate data
     if (!title.length) {
@@ -34,11 +34,7 @@ exports.createBlog = async (req, res) => {
         });
     }
     if (!draft) {
-        if (
-            !banner.length ||
-            !tags.length ||
-            !content.blocks.length
-        ) {
+        if (!banner.length || !tags.length || !content.blocks.length) {
             return res.status(403).json({
                 success: false,
                 message: "Please provide all required field",
@@ -51,54 +47,73 @@ exports.createBlog = async (req, res) => {
             });
         }
     }
-    
 
     // make tags lowercase
     tags = tags.map((tag) => tag.toLowerCase());
 
     // create a unique blog id (for later access)
     const blog_id =
+        id ||
         title
             .replace(/[^a-zA-Z0-9]/g, " ")
             .replace(/\s+/g, "-")
             .trim() + nanoid();
 
-    // create blog entry
-    let blog = new Blog({
-        title,
-        des,
-        banner,
-        content,
-        tags,
-        author: authorId,
-        blog_id,
-        draft: Boolean(draft),
-    });
-    blog.save()
-        .then((blog) => {
-            let incrementVal = draft ? 0 : 1;
-
-            // increment user's blog count
-            User.findOneAndUpdate(
-                { _id: authorId },
-                {
-                    $inc: { "account_info.total_posts": incrementVal },
-                    $push: { blogs: blog._id },
-                }
-            )
-                .then((user) => {
-                    return res.status(200).json({ id: blog.blog_id });
-                })
-                .catch((err) => {
-                    return res.status(500).json({
-                        success: false,
-                        message: "Failed to update User profile",
-                    });
+    // if updating a blog, find the old blog and update
+    if (id) {
+        Blog.findOneAndUpdate(
+            { blog_id: id },
+            { title, des, banner, content, tags, draft: draft ? draft : false }
+        )
+            .then(() => {
+                return res.status(200).json({ id: blog_id });
+            })
+            .catch((err) => {
+                return res.status(500).json({
+                    success: false,
+                    message: "Failed to update blog",
                 });
-        })
-        .catch((err) => {
-            return res
-                .status(500)
-                .json({ success: false, message: err.message });
+            });
+    }
+    // create a new blog
+    else {
+        // create blog entry
+        let blog = new Blog({
+            title,
+            des,
+            banner,
+            content,
+            tags,
+            author: authorId,
+            blog_id,
+            draft: Boolean(draft),
         });
+        blog.save()
+            .then((blog) => {
+                let incrementVal = draft ? 0 : 1;
+
+                // increment user's blog count
+                User.findOneAndUpdate(
+                    { _id: authorId },
+                    {
+                        $inc: { "account_info.total_posts": incrementVal },
+                        $push: { blogs: blog._id },
+                    }
+                )
+                    .then((user) => {
+                        return res.status(200).json({ id: blog.blog_id });
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({
+                            success: false,
+                            message: "Failed to update User profile",
+                        });
+                    });
+            })
+            .catch((err) => {
+                return res
+                    .status(500)
+                    .json({ success: false, message: err.message });
+            });
+    }
 };
