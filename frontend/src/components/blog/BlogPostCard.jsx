@@ -1,5 +1,5 @@
 import React from "react";
-import { getDay } from "./helper/DateFormatter";
+import { getDay } from "../../utils/DateFormatter";
 import { Link } from "react-router-dom";
 
 const BlogPostCard = ({ content, author }) => {
@@ -15,7 +15,10 @@ const BlogPostCard = ({ content, author }) => {
     const { fullname, username, profile_img } = author;
 
     return (
-        <Link to={`/blog/${id}`} className="flex gap-8 items-center border-b border-grey pb-5 mb-4">
+        <Link
+            to={`/blog/${id}`}
+            className="flex gap-8 items-center border-b border-grey pb-5 mb-4"
+        >
             {/* blog content */}
             <div className="w-full">
                 {/* username + published at */}
@@ -51,7 +54,11 @@ const BlogPostCard = ({ content, author }) => {
 
             {/* blog banner */}
             <div className="h-28 aspect-square bg-grey">
-                <img src={banner} alt="Blog Banner" className="w-full h-full aspect-square object-cover" />
+                <img
+                    src={banner}
+                    alt="Blog Banner"
+                    className="w-full h-full aspect-square object-cover"
+                />
             </div>
         </Link>
     );

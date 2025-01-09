@@ -5,3 +5,10 @@ export const getDay = (timestamp) => {
     const date = new Date(timestamp);
     return `${date.getDate()} ${month[date.getMonth()]}`;
 }
+
+
+export const getMonYear = (timestamp) => {
+    const date = new Date(timestamp);
+
+    return `${month[date.getMonth()]}, ${date.getFullYear()}`;
+}

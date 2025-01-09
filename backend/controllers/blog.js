@@ -62,14 +62,28 @@ exports.getLatestBlogCount = async (req, res) => {
 // blog count by applicable filter
 exports.getFilterBlogCount = async (req, res) => {
     try {
-        let { tag, query } = req.body;
+        let { tag, author, query } = req.body;
 
         let findQuery;
 
         if (tag) {
             findQuery = { tags: tag, draft: false };
-        } else if (query) {
-            findQuery = { draft: false, title: new RegExp(query, "i") };
+        } 
+        else if (query) {
+            // only title
+            // findQuery = { draft: false, title: new RegExp(query, "i") };
+    
+            // both title + tag
+            findQuery = {
+                draft: false,
+                $or: [
+                    { title: new RegExp(query, "i") },
+                    { tags: { $in: [new RegExp(`^${query}$`, "i")] } } 
+                ]
+            };
+        }
+        else if (author) {
+            findQuery = { author, draft: false };
         }
 
         const count = await Blog.countDocuments(findQuery);
@@ -130,7 +144,7 @@ exports.getTrendingBlog = async (req, res) => {
 
 // get filtered blogs - category, search-query
 exports.getFilteredBlog = async (req, res) => {
-    let { tag, query, page } = req.body;
+    let { tag, query, author, page } = req.body;
 
     let findQuery;
 
@@ -149,6 +163,9 @@ exports.getFilteredBlog = async (req, res) => {
                 { tags: { $in: [new RegExp(`^${query}$`, "i")] } } 
             ]
         };
+    }
+    else if (author) {
+        findQuery = { author, draft: false };
     }
 
     let maxLimit = 2;
