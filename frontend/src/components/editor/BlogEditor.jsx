@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import PageAnimationWrapper from "../common/PageAnimation";
 import defaultBanner from "../../assets/blog banner.png";
@@ -21,24 +21,28 @@ const BlogEditor = () => {
         setTextEditor,
         setEditorState,
     } = useContext(EditorContext);
+
     let { userAuth } = useContext(UserContext);
     let access_token;
     if (userAuth != null) {
         access_token = userAuth.access_token;
     }
+    let { blog_id } = useParams();
 
     const navigate = useNavigate();
 
     // create editor
     useEffect(() => {
-        setTextEditor(
-            new EditorJS({
-                holder: "textEditor",
-                data: content,
-                tools: tools,
-                placeholder: "Let's write an awesome story...",
-            })
-        );
+        if (!textEditor.isReady) {
+            setTextEditor(
+                new EditorJS({
+                    holder: "textEditor",
+                    data: Array.isArray(content) ? content[0] : content,
+                    tools: tools,
+                    placeholder: "Let's write an awesome story...",
+                })
+            );
+        }
     }, []);
 
     // upload blog banner preview
@@ -161,7 +165,7 @@ const BlogEditor = () => {
                     .post(
                         import.meta.env.VITE_SERVER_DOMAIN +
                             "/blogs/create-blog",
-                        blogObj,
+                        {...blogObj, id: blog_id},
                         {
                             headers: {
                                 Authorization: `Bearer ${access_token}`,

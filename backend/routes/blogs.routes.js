@@ -1,7 +1,7 @@
 const express = require('express');
 const { createBlog } = require('../controllers/editor');
 const { verifyUser } = require('../controllers/auth');
-const { getLatestBlog, getTrendingBlog, getFilteredBlog, getLatestBlogCount, getFilterBlogCount } = require('../controllers/blog');
+const { getLatestBlog, getTrendingBlog, getFilteredBlog, getLatestBlogCount, getFilterBlogCount, getBlog, likeBlog, isLikedByUser, addComment, getComments, getReplies, deleteComment } = require('../controllers/blog');
 const router = express.Router();
 
 
@@ -12,6 +12,12 @@ router.get('/trending-blogs', getTrendingBlog);
 router.post('/search-blogs', getFilteredBlog);
 router.post('/all-latest-blogs-count', getLatestBlogCount);
 router.post('/search-blogs-count', getFilterBlogCount);
-
+router.post('/get-blog', getBlog);
+router.post('/like-blog', verifyUser, likeBlog);
+router.post('/isliked-by-user', verifyUser, isLikedByUser);
+router.post('/add-comment', verifyUser, addComment);
+router.post('/get-blog-comments', getComments);
+router.post('/get-replies', getReplies);
+router.post('/delete-comment', verifyUser, deleteComment);
 
 module.exports = router;

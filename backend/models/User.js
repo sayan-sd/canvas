@@ -75,7 +75,7 @@ const UserSchema = new Schema(
             },
         },
         social_links: {
-            youtube: {
+            linkedin: {
                 type: String,
                 default: "",
             },

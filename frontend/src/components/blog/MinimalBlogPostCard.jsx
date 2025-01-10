@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getDay } from "./helper/DateFormatter";
+import { getDay } from "../../utils/DateFormatter";
 
 const MinimalBlogPostCard = ({ blog, index }) => {
     const {
@@ -34,7 +34,7 @@ const MinimalBlogPostCard = ({ blog, index }) => {
                 </div>
 
                 {/* blog title */}
-                <h1 className="blog-title">{ title }</h1>
+                <h1 className="blog-title">{title}</h1>
             </div>
         </Link>
     );

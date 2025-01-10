@@ -8,6 +8,8 @@ import Editor from "./pages/Editor";
 import HomePage from "./pages/HomePage";
 import SearchPage from "./pages/SearchPage";
 import PageNotFound404 from "./pages/PageNotFound404";
+import UserProfilePage from "./pages/UserProfilePage";
+import BlogDisplayPage from "./pages/BlogDisplayPage";
 
 export const UserContext = createContext({});
 
@@ -28,6 +30,7 @@ function App() {
             <Routes>
                 {/* Write Blog Route */}
                 <Route path="/editor" element={<Editor />} />
+                <Route path="/editor/:blog_id" element={<Editor />} />
                 
                 <Route path="/" element={<Navbar />}>
                     <Route index element={ <HomePage/> } />
@@ -41,6 +44,8 @@ function App() {
                     />
                     <Route path="/reset-password/:token" element={<ResetPassword />} />
                     <Route path="/search/:query" element={<SearchPage />} />
+                    <Route path="/user/:id" element={<UserProfilePage/>} />
+                    <Route path="/blog/:blog_id" element={<BlogDisplayPage/>} />
                     <Route path="*" element={<PageNotFound404/>} />
                 </Route>
             </Routes>
