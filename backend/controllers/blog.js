@@ -2,6 +2,7 @@ const Blog = require("../models/Blog");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
 const Comment = require("../models/Comment");
+const deleteComments = require("./helper/deleteComments");
 
 // latest blog posts
 exports.getLatestBlog = async (req, res) => {
@@ -438,6 +439,25 @@ exports.addComment = async (req, res) => {
         });
     });
 };
+
+// delete a comment
+exports.deleteComment = async (req, res) => {
+    let user_id = req.user;
+    const { _id } = req.body;
+
+    Comment.findOne({ _id }).then(comment => {
+        // validate the user (author or owner)
+        if (user_id == comment.commented_by || user_id == comment.blog_author) {
+            // delete the comment
+            deleteComments(_id)
+
+            return res.status(200).json({message: 'Comment deleted successfully'});
+        }
+        else {
+            return res.status(403).json({ message: "Forbidden Request" });
+        }
+    })
+}
 
 // get all comments for a blog
 exports.getComments = async (req, res) => {
