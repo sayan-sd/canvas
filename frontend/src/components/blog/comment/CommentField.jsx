@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { BlogContext } from "../../../pages/BlogDisplayPage";
 
-const CommentField = ({ action }) => {
+const CommentField = ({ action, index = undefined, replyingTo = undefined, setReplying }) => {
     const [comment, setComment] = useState("");
 
     const {
@@ -41,6 +41,7 @@ const CommentField = ({ action }) => {
                     _id,
                     blog_author,
                     comment,
+                    replying_to: replyingTo,
                 },
                 { headers: { Authorization: "Bearer " + access_token } }
             )
@@ -54,10 +55,28 @@ const CommentField = ({ action }) => {
 
                 // add new comment with the old comment array
                 let newCommentArr;
-                data.childrenLevel = 0; // parent
-                newCommentArr = [data, ...commentsArr];
 
-                let parentCommentIncrementVal = 1;
+                // check if reply
+                if (replyingTo) {
+                    commentsArr[index].children.push(data._id);
+                    data.childrenLevel = commentsArr[index].childrenLevel + 1;
+                    data.parentIndex = index;
+
+                    // update the comment array
+                    commentsArr[index].isReplyLoaded = true;
+                    commentsArr.splice(index + 1, 0, data);
+                    newCommentArr = commentsArr;
+
+                    // hide text area
+                    setReplying(false);
+                }
+                else {
+                    data.childrenLevel = 0; // parent
+                    newCommentArr = [data, ...commentsArr];
+                }
+
+                let parentCommentIncrementVal = replyingTo ? 0 : 1;
+
                 setBlog({
                     ...blog,
                     comments: { ...comments, results: newCommentArr },
