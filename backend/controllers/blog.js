@@ -492,7 +492,7 @@ exports.getReplies = async (req, res) => {
     Comment.findOne({ _id })
         .populate({
             path: "children",
-            option: {
+            options: {
                 skip: skip,
                 limit: maxLimit,
                 sort: { 'commentedAt': -1 },
