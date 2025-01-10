@@ -7,6 +7,9 @@ import { getDay } from "../utils/DateFormatter";
 import BlogInteraction from "../components/blog/BlogInteraction";
 import BlogPostCard from "../components/blog/BlogPostCard";
 import BlogContent from "../components/blog/BlogContent";
+import CommentsContainer, {
+    fetchComments,
+} from "../components/blog/comment/CommentsContainer";
 
 // empty blog structure
 export const blogStructure = {
@@ -26,8 +29,9 @@ const BlogDisplayPage = () => {
     const [loading, setLoading] = useState(true);
     const [similarBlogs, setSimilarBlogs] = useState(null);
     const [isLikedByUser, setIsLikedByUser] = useState(false);
-    const [commentsWrapper, setCommentsWrapper] = useState(true);
-    const [totalParentCommentsLoaded, setTotalCommentsLoaded] = useState(0);
+    const [commentsWrapper, setCommentsWrapper] = useState(false);
+    const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] =
+        useState(0);
 
     let {
         title,
@@ -44,9 +48,15 @@ const BlogDisplayPage = () => {
             .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/get-blog", {
                 blog_id,
             })
-            .then(({ data }) => {
+            .then(async ({ data }) => {
                 const blog = data.blog;
+                blog.comments = await fetchComments({
+                    blog_id: blog._id,
+                    setParentCommentCountFn: setTotalParentCommentsLoaded,
+                });
+
                 setBlog(blog);
+                // console.log(blog)
 
                 // similar blogs - same tag
                 axios
@@ -77,6 +87,9 @@ const BlogDisplayPage = () => {
         setBlog(blogStructure);
         setSimilarBlogs(null);
         setLoading(true);
+        setIsLikedByUser(false);
+        setCommentsWrapper(false);
+        setTotalParentCommentsLoaded(0);
     };
 
     return (
@@ -84,7 +97,21 @@ const BlogDisplayPage = () => {
             {loading ? (
                 <Loader />
             ) : (
-                <BlogContext.Provider value={{ blog, setBlog, isLikedByUser, setIsLikedByUser }}>
+                <BlogContext.Provider
+                    value={{
+                        blog,
+                        setBlog,
+                        isLikedByUser,
+                        setIsLikedByUser,
+                        commentsWrapper,
+                        setCommentsWrapper,
+                        totalParentCommentsLoaded,
+                        setTotalParentCommentsLoaded,
+                    }}
+                >
+                    {/* comment Card */}
+                    <CommentsContainer />
+
                     <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
                         <img
                             src={banner}
@@ -133,7 +160,7 @@ const BlogDisplayPage = () => {
                             {content[0].blocks.map((block, i) => {
                                 return (
                                     <div key={i} className="my-4 md:my-8">
-                                        <BlogContent block={block}/>
+                                        <BlogContent block={block} />
                                     </div>
                                 );
                             })}

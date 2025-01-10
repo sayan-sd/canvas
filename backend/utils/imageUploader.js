@@ -2,7 +2,7 @@ const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 const fs = require('fs');
 
-exports.uploadImageToCloudinary = async (file, height, quality) => {
+exports.uploadImageToCloudinary = async (file, height, quality = 90) => {
     const folder = process.env.FOLDER_NAME;
     const options = { folder }
 

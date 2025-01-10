@@ -53,7 +53,7 @@ const BlogSchema = new Schema({
     },
     comments: {
         type: [Schema.Types.ObjectId],
-        ref: 'comments'
+        ref: 'Comment'
     },
     draft: {
         type: Boolean,
