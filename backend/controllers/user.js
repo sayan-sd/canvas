@@ -1,4 +1,7 @@
 const User = require("../models/User");
+let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
+const bcrypt = require('bcrypt')
+
 
 // search matched users
 exports.getSearchUsers = async (req, res) => {
@@ -29,6 +32,7 @@ exports.getSearchUsers = async (req, res) => {
     }
 };
 
+
 // get specific profile
 exports.getUserProfile = async (req, res) => {
     try {
@@ -52,3 +56,49 @@ exports.getUserProfile = async (req, res) => {
         });
     }
 };
+
+
+// change password
+exports.changePassword = async (req, res) => {
+    let { currentPassword, newPassword } = req.body;
+
+    // validate data
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+    if (!passwordRegex.test(newPassword)) {
+        return res.status(403).json({
+            message: "New password is invalid",
+        });
+    }
+
+    try {
+        // find the user
+        let user = await User.findOne({ _id: req.user });
+        
+        // check if it is authenticated by google
+        if (user.google_auth) {
+            return res.status(403).json({
+                message: "You can't change your password because you logged in through Google account"
+            });
+        }
+
+        // check if current password is correct
+        const isMatch = await bcrypt.compare(currentPassword, user.personal_info.password);
+        if (!isMatch) {
+            return res.status(403).json({ message: "Incorrect current password" });
+        }
+        
+        // update password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.personal_info.password = hashedPassword;
+        await user.save();
+        
+        return res.status(200).json({ message: "Password changed successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Server Error: " + error.message,
+        });
+    }
+}

@@ -12,7 +12,7 @@ const Navbar = () => {
 
     const { userAuth } = useContext(UserContext);
     let accesss_token, profile_img;
-    if (userAuth != null) {
+    if (userAuth != null && userAuth.access_token) {
         accesss_token = userAuth.access_token;
         profile_img = userAuth.profile_img;
     }
