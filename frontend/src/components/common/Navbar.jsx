@@ -12,7 +12,7 @@ const Navbar = () => {
 
     const { userAuth } = useContext(UserContext);
     let accesss_token, profile_img;
-    if (userAuth) {
+    if (userAuth != null) {
         accesss_token = userAuth.access_token;
         profile_img = userAuth.profile_img;
     }
@@ -35,7 +35,7 @@ const Navbar = () => {
 
     return (
         <div>
-            <nav className="navbar">
+            <nav className="navbar z-50">
                 {/* Logo */}
                 <Link to={"/"} className="flex-none w-10">
                     <img src={logo} alt="C\anvas Logo" className="w-full" />
