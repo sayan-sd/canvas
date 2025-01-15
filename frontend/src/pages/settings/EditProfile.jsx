@@ -1,14 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "../../App";
 import axios from "axios";
 import { profileDataStructure } from "../UserProfilePage";
 import PageAnimationWrapper from "../../components/common/PageAnimation";
 import Loader from "../../components/common/Loader";
 import InputBox from "../../components/auth/InputBox";
+import toast from "react-hot-toast";
+import { uploadImage } from "../../utils/uploadImage";
+import { storeInSession } from "../../components/common/session";
 
 const EditProfile = () => {
     const bioLimit = 200;
-    const { userAuth } = useContext(UserContext);
+    const { userAuth, setUserAuth } = useContext(UserContext);
     let access_token;
     if (userAuth != null) {
         access_token = userAuth.access_token;
@@ -17,6 +20,10 @@ const EditProfile = () => {
     const [profile, setProfile] = useState(profileDataStructure);
     const [loading, setLoading] = useState(true);
     const [charactersLeft, setCharactersLeft] = useState(bioLimit);
+    const [updatedProfileImg, setUpdatedProfileImg] = useState(null);
+
+    let profileImgEle = useRef();
+    let editProfileForm = useRef();
 
     let {
         personal_info: {
@@ -48,12 +55,149 @@ const EditProfile = () => {
         setCharactersLeft(bioLimit - bio.length);
     }, [profile]);
 
+    const handleImagePreview = (e) => {
+        let img = e.target.files[0];
+        profileImgEle.current.src = URL.createObjectURL(img);
+        setUpdatedProfileImg(img);
+    };
+
+    const handleImageUpload = async (e) => {
+        e.preventDefault();
+
+        // validate data
+        if (updatedProfileImg) {
+            let loadingToast = toast.loading("Uploading Image...");
+            e.target.setAttribute("disabled", true);
+
+            // send data to server
+            const result = await uploadImage(updatedProfileImg);
+            if (result.success) {
+                // toast.dismiss(loadingToast);
+                // setBlog({ ...blog, banner: result.url });
+                // toast.success("Uploaded 👍");
+                let url = result.url;
+                axios
+                    .post(
+                        import.meta.env.VITE_SERVER_DOMAIN +
+                            "/users/update-profile-img",
+                        { url },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${access_token}`,
+                            },
+                        }
+                    )
+                    .then(({ data }) => {
+                        console.log(data.profile_img);
+                        let newUserAuth = {
+                            ...userAuth,
+                            profile_img: data.profile_img,
+                        };
+                        storeInSession("user", JSON.stringify(newUserAuth));
+                        setUserAuth(newUserAuth);
+
+                        setUpdatedProfileImg(null);
+                        toast.dismiss(loadingToast);
+                        e.target.removeAttribute("disabled");
+                        toast.success("Profile image updated 👍");
+                    })
+                    .catch(({ response }) => {
+                        toast.dismiss(loadingToast);
+                        e.target.removeAttribute("disabled");
+                        toast.error(response.data.message);
+                    });
+            } else {
+                toast.dismiss(loadingToast);
+                e.target.removeAttribute("disabled");
+                return toast.error("Error uploading Image");
+            }
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        let form = new FormData(editProfileForm.current);
+        let formData = {};
+        for (let [key, value] of form.entries()) {
+            formData[key] = value;
+        }
+        console.log(formData);
+
+        let {
+            fullname,
+            username,
+            bio,
+            linkedin,
+            facebook,
+            twitter,
+            github,
+            instagram,
+            website,
+        } = formData;
+
+        // validate data
+        if (fullname.length < 3) {
+            return toast.error("Fullname should be at least 3 characters long");
+        }
+        if (username.length < 3) {
+            return toast.error("Username should be at least 3 characters long");
+        }
+        if (bio.length > bioLimit) {
+            return toast.error(`Bio should not exceed ${bioLimit} characters`);
+        }
+
+        let loadingToast = toast.loading("Updating...");
+        e.target.setAttribute("disabled", true);
+
+        // send data to server
+        axios
+            .post(
+                import.meta.env.VITE_SERVER_DOMAIN + "/users/update-profile",
+                {
+                    fullname,
+                    username,
+                    bio,
+                    social_links: {
+                        linkedin,
+                        facebook,
+                        twitter,
+                        github,
+                        instagram,
+                        website,
+                    },
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            )
+            .then(({ data }) => {
+                // username changed
+                if (userAuth.username != data.username) {
+                    let newUserAuth = { ...userAuth, username: data.username };
+                    storeInSession("user", JSON.stringify(newUserAuth));
+                    setUserAuth(newUserAuth);
+                }
+
+                toast.dismiss(loadingToast);
+                e.target.removeAttribute("disabled");
+                toast.success("Profile updated successfully");
+            })
+            .catch(({ response }) => {
+                toast.dismiss(loadingToast);
+                e.target.removeAttribute("disabled");
+                toast.error(response.data.message);
+            });
+    };
+
     return (
         <PageAnimationWrapper>
             {loading ? (
                 <Loader />
             ) : (
-                <form>
+                <form ref={editProfileForm}>
                     <h1 className="max-md:hidden">Edit Profile</h1>
 
                     <div className="flex flex-col lg:flex-row items-start py-10 gap-8 lg:gap-10">
@@ -66,16 +210,24 @@ const EditProfile = () => {
                                 <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white bg-black/40 opacity-0 hover:opacity-100 cursor-pointer">
                                     Upload Image
                                 </div>
-                                <img src={profile_img} alt="Profile Image" />
+                                <img
+                                    src={profile_img}
+                                    alt="Profile Image"
+                                    ref={profileImgEle}
+                                />
                             </label>
                             <input
                                 type="file"
                                 id="uploadImg"
                                 accept=".jpeg, .png, .jpg"
                                 hidden
+                                onChange={handleImagePreview}
                             />
 
-                            <button className="btn-light mt-5 max-lg:center lg:w-full px-10">
+                            <button
+                                className="btn-light mt-5 max-lg:center lg:w-full px-10"
+                                onClick={handleImageUpload}
+                            >
                                 Upload
                             </button>
                         </div>
@@ -166,6 +318,7 @@ const EditProfile = () => {
                             <button
                                 className="btn-dark w-auto px-10 mt-5"
                                 type="submit"
+                                onClick={handleSubmit}
                             >
                                 Update
                             </button>

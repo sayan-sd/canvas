@@ -156,7 +156,7 @@ const UserProfilePage = () => {
                         {/* User About - lg */}
                         <AboutUser
                             className={"max-md:hidden"}
-                            bio={bio}
+                            bio={bio.length ? bio : "Hey there! Check out my stories on Canvas!"}
                             social_links={social_links}
                             joindAt={joinedAt}
                         />
@@ -204,7 +204,7 @@ const UserProfilePage = () => {
 
                             {/* trending blogs */}
                             <AboutUser
-                                bio={bio}
+                                bio={bio.length ? bio : "Hey there! Check out my stories on Canvas!"}
                                 social_links={social_links}
                                 joindAt={joinedAt}
                             />
