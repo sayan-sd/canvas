@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import logo from "../../assets/logo.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../../App";
 import UserNavigationPanel from "../user/UserNavigationPanel";
+import axios from "axios";
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
@@ -10,28 +11,47 @@ const Navbar = () => {
 
     const navigate = useNavigate();
 
-    const { userAuth } = useContext(UserContext);
-    let accesss_token, profile_img;
+    const { userAuth, setUserAuth } = useContext(UserContext);
+    let accesss_token, profile_img, new_notification_available;
     if (userAuth != null && userAuth.access_token) {
         accesss_token = userAuth.access_token;
         profile_img = userAuth.profile_img;
+        new_notification_available = userAuth.new_notification_available;
     }
 
     const handleBlur = () => {
         setTimeout(() => {
             setUserNavPanel(false);
         }, 300);
-    }
+    };
 
+    // notification red dot
+    useEffect(() => {
+        if (accesss_token) {
+            axios
+                .get(
+                    import.meta.env.VITE_SERVER_DOMAIN +
+                        "/users/new-notifications",
+                    {
+                        headers: { Authorization: "Bearer " + accesss_token },
+                    }
+                )
+                .then(({ data }) => {
+                    setUserAuth({ ...userAuth, ...data });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    }, [accesss_token]);
 
     const handleSearch = (e) => {
         let query = e.target.value;
 
-        if (e.key == 'Enter' && query.length) {
+        if (e.key == "Enter" && query.length) {
             navigate(`/search/${query}`);
         }
-    }
-
+    };
 
     return (
         <div>
@@ -78,17 +98,30 @@ const Navbar = () => {
                     {accesss_token ? (
                         <>
                             <Link to={"/dashboard/notification"}>
-                                <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
-                                    <i className="fi fi-rr-bell text-xl"></i>
+                                <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center">
+                                    <i className="fi fi-rr-bell text-xl mt-1"></i>
+                                    {new_notification_available ? (
+                                        <span className="bg-red w-3 h-3 rounded-full absolute z-10 top-2 right-3"></span>
+                                    ) : (
+                                        ""
+                                    )}
                                 </button>
                             </Link>
 
-                            <div className="relative" onClick={() => setUserNavPanel(!userNavPanel)} onBlur={handleBlur}>
+                            <div
+                                className="relative"
+                                onClick={() => setUserNavPanel(!userNavPanel)}
+                                onBlur={handleBlur}
+                            >
                                 <button className="h-12 w-12 mt-1">
-                                    <img src={profile_img} alt="Profile Image" className="w-full h-full object-cover rounded-full"/>
+                                    <img
+                                        src={profile_img}
+                                        alt="Profile Image"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
                                 </button>
 
-                                {userNavPanel ? <UserNavigationPanel/> : ""}
+                                {userNavPanel ? <UserNavigationPanel /> : ""}
                             </div>
                         </>
                     ) : (
