@@ -97,7 +97,7 @@ const Navbar = () => {
                     {/* dashboard for logged in user */}
                     {accesss_token ? (
                         <>
-                            <Link to={"/dashboard/notification"}>
+                            <Link to={"/dashboard/notifications"}>
                                 <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center">
                                     <i className="fi fi-rr-bell text-xl mt-1"></i>
                                     {new_notification_available ? (

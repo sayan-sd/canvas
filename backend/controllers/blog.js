@@ -369,7 +369,7 @@ exports.isLikedByUser = async (req, res) => {
 exports.addComment = async (req, res) => {
     let user_id = req.user;
 
-    let { _id, comment, blog_author, replying_to } = req.body;
+    let { _id, comment, blog_author, replying_to, notification_id } = req.body;
 
     // validate comment
     if (!comment.length) {
@@ -426,6 +426,13 @@ exports.addComment = async (req, res) => {
                 notificationObj.notification_for =
                     replyingToCommentDoc.commented_by;
             });
+
+            if (notification_id) {
+                Notification.findOneAndUpdate(
+                    { _id: notification_id },
+                    { reply: commentFile._id }
+                ).then(notification => {})
+            }
         }
 
         new Notification(notificationObj).save().then((notification) => {});

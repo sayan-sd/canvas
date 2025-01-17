@@ -37,21 +37,23 @@ const SideNav = () => {
         }
     };
 
-    // run when page state is changed
-    // useEffect(() => {
-    //     // Initial click after mount
-    //     if (pageStateTab.current) {
-    //         pageStateTab.current.click();
-    //     }
-    // }, []); // Empty dependency array for mount only
-
     // useEffect(() => {
     //     setShowSideNav(false);
+    //     pageStateTab.current.click();
     // }, [pageState]);
 
     useEffect(() => {
         setShowSideNav(false);
-        pageStateTab.current.click();
+        
+        // Instead of triggering a click, directly call the logic
+        if (pageStateTab.current) {
+            const { offsetWidth, offsetLeft } = pageStateTab.current;
+            
+            if (activeTabLine.current) {
+                activeTabLine.current.style.width = `${offsetWidth}px`;
+                activeTabLine.current.style.left = `${offsetLeft}px`;
+            }
+        }
     }, [pageState]);
 
     return access_token === undefined ? (

@@ -9,10 +9,11 @@ import NoDataMessage from "../../components/common/NoDataMessage";
 import LoadMoreDataBtn from "../../components/common/LoadMoreDataBtn";
 
 const Notifications = () => {
-    const { userAuth } = useContext(UserContext);
-    let access_token;
+    const { userAuth, setUserAuth } = useContext(UserContext);
+    let access_token, new_notification_available;
     if (userAuth != null) {
         access_token = userAuth.access_token;
+        new_notification_available = userAuth.new_notification_available;
     }
     const filters = ["all", "like", "comment", "reply"];
     const [filter, setFilter] = useState("all");
@@ -26,6 +27,10 @@ const Notifications = () => {
                 { headers: { Authorization: "Bearer " + access_token } }
             )
             .then(async ({ data: { notifications: data } }) => {
+                if (new_notification_available) {
+                    setUserAuth({ ...userAuth, new_notification_available: false });
+                }
+
                 let formattedData = await filterPaginationData({
                     state: notifications,
                     data,

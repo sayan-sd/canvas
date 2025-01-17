@@ -244,6 +244,10 @@ exports.getNotifications = async (req, res) => {
         .sort({ createdAt: -1 })
         .select("createdAt type seen reply")
         .then((notifications) => {
+            Notification.updateMany(findQuery, { seen: true })
+                .skip(skipDocs)
+                .limit(maxLimit)
+                .then((notificationSeen) => {});
             return res.status(200).json({ notifications });
         })
         .catch((error) => {
