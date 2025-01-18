@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const Notification = require("../models/Notification");
+const Comment = require("../models/Comment");
+const Blog = require("../models/Blog");
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 const bcrypt = require("bcrypt");
 
@@ -278,4 +280,102 @@ exports.getNotificationsCount = async (req, res) => {
                 message: "Server Error: " + error.message,
             });
         });
+};
+
+// all user writtten blogs
+exports.getUserWrittenBlogs = async (req, res) => {
+    let user_id = req.user;
+    let { page, draft, query, deletedDocCount, totalDocs } = req.body;
+
+    let maxLimit = 5;
+    let skipDocs = (page - 1) * maxLimit;
+    if (deletedDocCount) {
+        skipDocs -= deletedDocCount;
+    }
+
+    Blog.find({ author: user_id, draft, title: new RegExp(query, "i") })
+        .skip(skipDocs)
+        .limit(maxLimit)
+        .sort({ publishedAt: -1 })
+        .select(" title banner publishedAt blog_id activity des draft -_id ")
+        .then((blogs) => {
+            return res.status(200).json({ blogs });
+        })
+        .catch((error) => {
+            return res
+                .status(500)
+                .json({ message: "Server Error: " + error.message });
+        });
+};
+
+// user written blogs count
+exports.getUserWrittenBlogsCount = async (req, res) => {
+    let user_id = req.user;
+    let { draft, query } = req.body;
+    Blog.countDocuments({
+        author: user_id,
+        draft,
+        title: new RegExp(query, "i"),
+    })
+        .then((count) => {
+            return res.status(200).json({ totalDocs: count });
+        })
+        .catch((error) => {
+            return res
+                .status(500)
+                .json({ message: "Server Error: " + error.message });
+        });
+};
+
+// delete blog
+exports.deleteBlog = async (req, res) => {
+    try {
+        const user_id = req.user;
+        const { blog_id } = req.body;
+
+        if (!blog_id) {
+            return res.status(400).json({ message: "Blog ID is required" });
+        }
+
+        // First find the blog to make sure it exists and to get its _id
+        const blog = await Blog.findOne({ blog_id });
+        
+        if (!blog) {
+            return res.status(404).json({ message: "Blog not found" });
+        }
+
+        // Delete the blog and related data in parallel
+        await Promise.all([
+            // Delete the blog
+            Blog.findOneAndDelete({ blog_id }),
+            
+            // Delete related notifications
+            Notification.deleteMany({ blog: blog._id }),
+            
+            // Delete related comments
+            Comment.deleteMany({ blog_id: blog._id }),
+            
+            // Update user
+            User.findOneAndUpdate(
+                { _id: user_id },
+                {
+                    $pull: { blogs: blog._id },
+                    $inc: { "account_info.total_posts": -1 }
+                }
+            )
+        ]);
+
+        return res.status(200).json({ 
+            success: true,
+            message: "Blog deleted successfully" 
+        });
+
+    } catch (err) {
+        console.error("Delete blog error:", err);
+        return res.status(500).json({ 
+            success: false,
+            message: "Server error while deleting blog",
+            error: err.message 
+        });
+    }
 };

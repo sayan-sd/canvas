@@ -1,8 +1,10 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { UserContext } from "../../App";
+import Loader from "../common/Loader";
 
 const SideNav = () => {
+    const [isLoading, setIsLoading] = useState(true);
     let { userAuth } = useContext(UserContext);
     let access_token, new_notification_available;
     if (userAuth != null) {
@@ -20,6 +22,18 @@ const SideNav = () => {
     let activeTabLine = useRef();
     let sideBarIconTab = useRef();
     let pageStateTab = useRef();
+
+    // Add effect to handle initial auth loading
+    useEffect(() => {
+        const checkAuth = () => {
+            // Wait a brief moment for auth to initialize
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 500);
+        };
+        
+        checkAuth();
+    }, []);
 
     const changePageState = (e) => {
         const target = e.currentTarget;
@@ -56,7 +70,16 @@ const SideNav = () => {
         }
     }, [pageState]);
 
-    return access_token === undefined ? (
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
+
+    return (!isLoading && access_token === undefined) ? (
         <Navigate to={"/signin"} />
     ) : (
         <>
