@@ -8,6 +8,7 @@ import axios from "axios";
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
     const [userNavPanel, setUserNavPanel] = useState(false);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -18,6 +19,17 @@ const Navbar = () => {
         profile_img = userAuth.profile_img;
         new_notification_available = userAuth.new_notification_available;
     }
+
+    // Handle initial auth loading
+    useEffect(() => {
+        const checkAuth = () => {
+            setTimeout(() => {
+                setIsAuthLoading(false);
+            }, 500);
+        };
+
+        checkAuth();
+    }, []);
 
     const handleBlur = () => {
         setTimeout(() => {
@@ -94,9 +106,16 @@ const Navbar = () => {
                         <i className="fi fi-rr-file-edit"></i>
                     </Link>
 
-                    {/* dashboard for logged in user */}
-                    {accesss_token ? (
+                    {/* Auth dependent section */}
+                    {isAuthLoading ? (
+                        // Loading state
+                        <div className="flex gap-3 md:gap-6 items-center">
+                            <div className="w-12 h-12 rounded-full bg-grey/70 animate-pulse"></div>
+                            <div className="w-12 h-12 rounded-full bg-grey animate-pulse"></div>
+                        </div>
+                    ) : accesss_token ? (
                         <>
+                            {/* dashboard for logged in user */}
                             <Link to={"/dashboard/notifications"}>
                                 <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center">
                                     <i className="fi fi-rr-bell text-xl mt-1"></i>
