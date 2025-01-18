@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import logo from "../../assets/logo.png";
+import darkLogo from "../../assets/logo-dark.png";
+import lightLogo from "../../assets/logo-light.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { UserContext } from "../../App";
+import { ThemeContext, UserContext } from "../../App";
 import UserNavigationPanel from "../user/UserNavigationPanel";
 import axios from "axios";
+import { storeInSession } from "./session";
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
@@ -19,6 +21,8 @@ const Navbar = () => {
         profile_img = userAuth.profile_img;
         new_notification_available = userAuth.new_notification_available;
     }
+
+    let { theme, setTheme } = useContext(ThemeContext);
 
     // Handle initial auth loading
     useEffect(() => {
@@ -65,12 +69,24 @@ const Navbar = () => {
         }
     };
 
+    const changeTheme = () => {
+        let newTheme = theme == "light" ? "dark" : "light";
+
+        setTheme(newTheme);
+        document.body.setAttribute("data-theme", newTheme);
+        storeInSession("theme", newTheme);
+    };
+
     return (
         <div>
             <nav className="navbar z-50">
                 {/* Logo */}
                 <Link to={"/"} className="flex-none w-10">
-                    <img src={logo} alt="C\anvas Logo" className="w-full" />
+                    <img
+                        src={theme == "light" ? lightLogo : darkLogo}
+                        alt="C\anvas Logo"
+                        className="w-full"
+                    />
                 </Link>
 
                 {/* Search Box */}
@@ -101,10 +117,21 @@ const Navbar = () => {
                         <i className="i fi-rr-search text-xl"></i>
                     </button>
 
-                    <Link to={"/editor"} className="hidden md:flex gap-2 link">
+                    <Link to={"/editor"} className="hidden md:flex gap-2 link hover:rounded-md">
                         <p>Write</p>
                         <i className="fi fi-rr-file-edit"></i>
                     </Link>
+
+                    <button
+                        className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center"
+                        onClick={changeTheme}
+                    >
+                        <i
+                            className={`fi fi-rr-${
+                                theme == "light" ? "moon-stars" : "sun"
+                            } text-xl mt-1`}
+                        ></i>
+                    </button>
 
                     {/* Auth dependent section */}
                     {isAuthLoading ? (
