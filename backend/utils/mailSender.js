@@ -15,7 +15,7 @@ const mailSender = async (email, title, body) => {
             from: 'ThinkEd by Sayan 📚',
             to: `${email}`,
             subject: `${title}`, 
-            html: `${body}`, 
+            html: `${body}`,
         });
         return info;
     }

@@ -5,12 +5,15 @@ import toast from "react-hot-toast";
 import InputBox from "./InputBox";
 
 const ResetPassword = () => {
-    const [password, setPassword] = useState("");
     const { token } = useParams();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const formData = Object.fromEntries(new FormData(e.target));
+        const password = formData.password;
+
         try {
             await axios.post(
                 `${import.meta.env.VITE_SERVER_DOMAIN}/reset-password`,
@@ -28,7 +31,7 @@ const ResetPassword = () => {
     return (
         <section className="h-cover flex items-center justify-center">
             <form onSubmit={handleSubmit} className="w-[80%] max-w-[400px]">
-                <h1 className="text-4xl font-gelasio capitalize text-center mb-20">
+                <h1 className="text-4xl font-gelasio capitalize text-center mb-16">
                     Reset Password
                 </h1>
                 <InputBox
@@ -36,11 +39,9 @@ const ResetPassword = () => {
                     type="password"
                     placeholder="Enter new password"
                     icon="key"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button className="btn-dark center mt-6" type="submit">
+                <button className="btn-dark center mt-14" type="submit">
                     Reset Password
                 </button>
             </form>
