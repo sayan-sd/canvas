@@ -9,7 +9,7 @@ exports.getLatestBlog = async (req, res) => {
     let { page } = req.body;
 
     try {
-        const maxLimit = 5;
+        const maxLimit = 10;
         const blogs = await Blog.find({ draft: false })
             .populate(
                 "author",
@@ -172,7 +172,7 @@ exports.getFilteredBlog = async (req, res) => {
         findQuery = { author, draft: false };
     }
 
-    let maxLimit = limit || 2;
+    let maxLimit = limit || 6;
 
     try {
         const blogs = await Blog.find(findQuery)
@@ -470,7 +470,7 @@ exports.deleteComment = async (req, res) => {
 exports.getComments = async (req, res) => {
     let { blog_id, skip } = req.body;
 
-    let maxLimit = 5;
+    let maxLimit = 6;
 
     Comment.find({ blog_id, isReply: false })
         .populate(

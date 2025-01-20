@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import PageAnimationWrapper from "../components/common/PageAnimation";
 import InpageNavigation, {
     activeTabRef,
@@ -16,6 +16,7 @@ const HomePage = () => {
     const [blogs, setBlogs] = useState(null);
     const [trendingBlogs, setTrendingBlogs] = useState(null);
     const [pageState, setPageState] = useState("home");
+    const [loading, setLoading] = useState(false);
 
     const categories = [
         "technology",
@@ -30,6 +31,9 @@ const HomePage = () => {
 
     // latest blogs
     const fetchLatestBlogs = async ({page = 1}) => {
+        if (loading) return;
+        setLoading(true);
+        
         axios
             .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/latest-blogs", {page})
             .then(async ({ data }) => {
@@ -38,12 +42,13 @@ const HomePage = () => {
                     data: data.blogs,
                     page,
                     countRoute: "/blogs/all-latest-blogs-count"
-                })
-                // console.log(formatedData);
+                });
                 setBlogs(formatedData);
+                setLoading(false);
             })
             .catch((err) => {
                 toast.error(err.message);
+                setLoading(false);
             });
     };
 
@@ -61,6 +66,9 @@ const HomePage = () => {
 
     // blogs by category
     const fetchBlogsByCategory = async ({page = 1}) => {
+        if (loading) return;
+        setLoading(true);
+
         axios
             .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/search-blogs", {
                 tag: pageState, page
@@ -72,17 +80,45 @@ const HomePage = () => {
                     page,
                     countRoute: "/blogs/search-blogs-count",
                     data_to_send: {tag: pageState}
-                })
-
+                });
                 setBlogs(formatedData);
+                setLoading(false);
             })
             .catch((err) => {
                 toast.error(err.message);
+                setLoading(false);
             });
     };
 
+    // Auto load more handler
+    const handleScroll = useCallback(() => {
+        const scrollHeight = document.documentElement.scrollHeight;
+        const scrollTop = window.scrollY;
+        const clientHeight = window.innerHeight;
+
+        // Check if we're near bottom and have more content to load
+        if (
+            !loading && 
+            blogs?.totalDocs > blogs?.results.length && 
+            scrollTop + clientHeight >= scrollHeight - 1
+            // scrollTop + clientHeight >= scrollHeight - 500
+        ) {
+            const nextPage = blogs.page + 1;
+            if (pageState === "home") {
+                fetchLatestBlogs({ page: nextPage });
+            } else {
+                fetchBlogsByCategory({ page: nextPage });
+            }
+        }
+    }, [blogs, loading, pageState]);
+
     useEffect(() => {
-        // vittual button click
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
+
+    useEffect(() => {
+        // virtual button click
         activeTabRef.current.click();
 
         if (pageState == "home") {
@@ -122,30 +158,42 @@ const HomePage = () => {
                             {blogs == null ? (
                                 <Loader />
                             ) : blogs.results.length ? (
-                                blogs.results.map((blog, i) => {
-                                    return (
-                                        <PageAnimationWrapper
-                                            transition={{
-                                                duration: 1,
-                                                delay: i * 0.1,
-                                            }}
-                                            key={i}
-                                        >
-                                            <BlogPostCard
-                                                content={blog}
-                                                author={
-                                                    blog.author.personal_info
-                                                }
-                                            />
-                                        </PageAnimationWrapper>
-                                    );
-                                })
+                                <>
+                                    {blogs.results.map((blog, i) => {
+                                        return (
+                                            <PageAnimationWrapper
+                                                transition={{
+                                                    duration: 1,
+                                                    delay: i * 0.1,
+                                                }}
+                                                key={i}
+                                            >
+                                                <BlogPostCard
+                                                    content={blog}
+                                                    author={
+                                                        blog.author.personal_info
+                                                    }
+                                                />
+                                            </PageAnimationWrapper>
+                                        );
+                                    })}
+                                    
+                                    {/* Show loading indicator when fetching more */}
+                                    {loading && <Loader />}
+                                    
+                                    {/* Keep the load more button visible but data will load automatically */}
+                                    <LoadMoreDataBtn
+                                        state={blogs}
+                                        fetchDataFunc={
+                                            pageState == "home"
+                                                ? fetchLatestBlogs
+                                                : fetchBlogsByCategory
+                                        }
+                                    />
+                                </>
                             ) : (
                                 <NoDataMessage message={"No blogs found"} />
                             )}
-
-                            {/* Load more button */}
-                            <LoadMoreDataBtn state={blogs} fetchDataFunc={(pageState == "home" ? fetchLatestBlogs : fetchBlogsByCategory)} />
                         </>
 
                         {/* trending blogs */}
@@ -176,7 +224,7 @@ const HomePage = () => {
                 {/* filter and trending blogs(lg) */}
                 <div className="min-w-[40%] lg:min-w-[400px] max-w-min border-l border-grey pl-8 pt-3 max-md:hidden">
                     <div className="flex flex-col gap-10">
-                        {/* cetegories (tags) */}
+                        {/* categories (tags) */}
                         <div>
                             <h1 className="font-medium text-xl mb-8">
                                 Stories from all interests

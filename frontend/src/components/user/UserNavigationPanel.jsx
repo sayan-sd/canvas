@@ -23,9 +23,10 @@ const UserNavigationPanel = () => {
                 {/* write tab (for small devices) */}
                 <Link
                     to={"/editor"}
-                    className="flex gap-2 link md:hidden pl-8 py-4"
+                    className="flex gap-2 link md:hidden pl-8 py-4 items-center"
                 >
                     <i className="fi fi-rr-file-edit"></i>
+                    Write
                 </Link>
 
                 {/* Profile */}
