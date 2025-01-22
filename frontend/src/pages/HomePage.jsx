@@ -11,6 +11,8 @@ import MinimalBlogPostCard from "../components/blog/MinimalBlogPostCard";
 import NoDataMessage from "../components/common/NoDataMessage";
 import { filterPaginationData } from "../components/home/FilterPaginationData";
 import LoadMoreDataBtn from "../components/common/LoadMoreDataBtn";
+import BlogPostCardSkeleton from "../components/blog/skeleton/BlogPostCardSkeleton";
+import MinimalBlogPostCardSkeleton from "../components/blog/skeleton/MinimalBlogPostCardSkeleton";
 
 const HomePage = () => {
     const [blogs, setBlogs] = useState(null);
@@ -156,7 +158,7 @@ const HomePage = () => {
                     >
                         <>
                             {blogs == null ? (
-                                <Loader />
+                                [...Array(5)].map((_, i) => <BlogPostCardSkeleton key={i} />)
                             ) : blogs.results.length ? (
                                 <>
                                     {blogs.results.map((blog, i) => {
@@ -179,7 +181,7 @@ const HomePage = () => {
                                     })}
                                     
                                     {/* Show loading indicator when fetching more */}
-                                    {loading && <Loader />}
+                                    {loading && [...Array(3)].map((_, i) => <BlogPostCardSkeleton key={i} />)}
                                     
                                     {/* Keep the load more button visible but data will load automatically */}
                                     <LoadMoreDataBtn
@@ -198,7 +200,7 @@ const HomePage = () => {
 
                         {/* trending blogs */}
                         {trendingBlogs == null ? (
-                            <Loader />
+                            [...Array(5)].map((_, i) => <MinimalBlogPostCardSkeleton key={i} />)
                         ) : (
                             trendingBlogs.length ? 
                             trendingBlogs.map((blog, i) => {
@@ -258,7 +260,7 @@ const HomePage = () => {
 
                             {/* trending blogs */}
                             {trendingBlogs == null ? (
-                                <Loader />
+                                [...Array(5)].map((_, i) => <MinimalBlogPostCardSkeleton key={i} />)
                             ) : (
                                 trendingBlogs.length ? 
                                 trendingBlogs.map((blog, i) => {
