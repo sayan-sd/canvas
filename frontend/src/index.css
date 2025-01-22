@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Gelasio&family=Inter:wght@400;500&display=swap');
 @import "@flaticon/flaticon-uicons/css/all/all";
+@import "./components/editor/editor-theme.css";
 
 
 @tailwind base;
@@ -17,7 +18,7 @@
     }
 
     body {
-        @apply font-inter font-normal text-black;
+        @apply font-inter font-normal text-black bg-white;
     }
 
     i {
@@ -126,3 +127,29 @@
 .cdx-settings-button[data-tune='stretched'] {
   display: none;
 }
+
+
+
+/* Global Scrollbar Style */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #727272;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+/* For Firefox */
+/* * {
+    scrollbar-width: thin;
+    scrollbar-color: #727272 transparent;
+} */

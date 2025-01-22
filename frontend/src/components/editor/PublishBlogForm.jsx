@@ -117,7 +117,7 @@ const PublishBlogForm = () => {
                 toast.success("Published 👍");
 
                 setTimeout(() => {
-                    navigate("/");
+                    navigate("/dashboard/blogs");
                 }, 500);
             })
             .catch(({ response }) => {
@@ -195,8 +195,8 @@ const PublishBlogForm = () => {
                     <div className="relative input-box pl-2 py-2 pb-4">
                         <input
                             type="text"
-                            placeholder="Topic"
-                            className=" sticky input-box bg-white top-0 left-0 pl-4 mb-3 focus:bg-white"
+                            placeholder="Press 'Enter' or separate your tags with comma(,)"
+                            className=" sticky input-box bg-white top-0 left-0 pl-4 mb-3 focus:bg-white placeholder-gray-500"
                             onKeyDown={handleTagsKeyDown}
                         />
 

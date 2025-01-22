@@ -123,9 +123,9 @@ const UserAuthForm = ({ type }) => {
             }
 
             // in sign-up sent otp then generate otp box
+            setShowOtpInput(true);
             await sendOTP(email);
             setFormData(newFormData);
-            setShowOtpInput(true);
             // setTimeout(() => sendOTP(email), 0);
             return;
         }
@@ -164,6 +164,7 @@ const UserAuthForm = ({ type }) => {
 
     const handleForgetPassword = async (e) => {
         e.preventDefault();
+        e.stopPropagation();
 
         // take email 
         const form = e.target.closest("form");
@@ -237,6 +238,7 @@ const UserAuthForm = ({ type }) => {
                             {type == "sign-in" && (
                                 <p className="mt-6 text-dark-grey text-xl text-right">
                                     <button
+                                        type="button"
                                         onClick={handleForgetPassword}
                                         className="underline text-black ml-1"
                                     >

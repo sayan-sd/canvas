@@ -1,44 +1,92 @@
-import React, { useContext, useState } from "react";
-import logo from "../../assets/logo.png";
+import React, { useContext, useEffect, useState } from "react";
+import darkLogo from "../../assets/logo-dark.png";
+import lightLogo from "../../assets/logo-light.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { UserContext } from "../../App";
+import { ThemeContext, UserContext } from "../../App";
 import UserNavigationPanel from "../user/UserNavigationPanel";
+import axios from "axios";
+import { storeInSession } from "./session";
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
     const [userNavPanel, setUserNavPanel] = useState(false);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
 
     const navigate = useNavigate();
 
-    const { userAuth } = useContext(UserContext);
-    let accesss_token, profile_img;
+    const { userAuth, setUserAuth } = useContext(UserContext);
+    let accesss_token, profile_img, new_notification_available;
     if (userAuth != null && userAuth.access_token) {
         accesss_token = userAuth.access_token;
         profile_img = userAuth.profile_img;
+        new_notification_available = userAuth.new_notification_available;
     }
+
+    let { theme, setTheme } = useContext(ThemeContext);
+
+    // Handle initial auth loading
+    useEffect(() => {
+        const checkAuth = () => {
+            setTimeout(() => {
+                setIsAuthLoading(false);
+            }, 500);
+        };
+
+        checkAuth();
+    }, []);
 
     const handleBlur = () => {
         setTimeout(() => {
             setUserNavPanel(false);
         }, 300);
-    }
+    };
 
+    // notification red dot
+    useEffect(() => {
+        if (accesss_token) {
+            axios
+                .get(
+                    import.meta.env.VITE_SERVER_DOMAIN +
+                        "/users/new-notifications",
+                    {
+                        headers: { Authorization: "Bearer " + accesss_token },
+                    }
+                )
+                .then(({ data }) => {
+                    setUserAuth({ ...userAuth, ...data });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    }, [accesss_token]);
 
     const handleSearch = (e) => {
         let query = e.target.value;
 
-        if (e.key == 'Enter' && query.length) {
+        if (e.key == "Enter" && query.length) {
             navigate(`/search/${query}`);
         }
-    }
+    };
 
+    const changeTheme = () => {
+        let newTheme = theme == "light" ? "dark" : "light";
+
+        setTheme(newTheme);
+        document.body.setAttribute("data-theme", newTheme);
+        storeInSession("theme", newTheme);
+    };
 
     return (
         <div>
             <nav className="navbar z-50">
                 {/* Logo */}
                 <Link to={"/"} className="flex-none w-10">
-                    <img src={logo} alt="C\anvas Logo" className="w-full" />
+                    <img
+                        src={theme == "light" ? lightLogo : darkLogo}
+                        alt="C\anvas Logo"
+                        className="w-full"
+                    />
                 </Link>
 
                 {/* Search Box */}
@@ -69,26 +117,57 @@ const Navbar = () => {
                         <i className="i fi-rr-search text-xl"></i>
                     </button>
 
-                    <Link to={"/editor"} className="hidden md:flex gap-2 link">
+                    <Link to={"/editor"} className="hidden md:flex gap-2 link hover:rounded-md">
                         <p>Write</p>
                         <i className="fi fi-rr-file-edit"></i>
                     </Link>
 
-                    {/* dashboard for logged in user */}
-                    {accesss_token ? (
+                    <button
+                        className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center"
+                        onClick={changeTheme}
+                    >
+                        <i
+                            className={`fi fi-rr-${
+                                theme == "light" ? "moon-stars" : "sun"
+                            } text-xl mt-1`}
+                        ></i>
+                    </button>
+
+                    {/* Auth dependent section */}
+                    {isAuthLoading ? (
+                        // Loading state
+                        <div className="flex gap-3 md:gap-6 items-center">
+                            <div className="w-12 h-12 rounded-full bg-grey/70 animate-pulse"></div>
+                            <div className="w-12 h-12 rounded-full bg-grey animate-pulse"></div>
+                        </div>
+                    ) : accesss_token ? (
                         <>
-                            <Link to={"/dashboard/notification"}>
-                                <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
-                                    <i className="fi fi-rr-bell text-xl"></i>
+                            {/* dashboard for logged in user */}
+                            <Link to={"/dashboard/notifications"}>
+                                <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 flex items-center justify-center">
+                                    <i className="fi fi-rr-bell text-xl mt-1"></i>
+                                    {new_notification_available ? (
+                                        <span className="bg-red w-3 h-3 rounded-full absolute z-10 top-2 right-3"></span>
+                                    ) : (
+                                        ""
+                                    )}
                                 </button>
                             </Link>
 
-                            <div className="relative" onClick={() => setUserNavPanel(!userNavPanel)} onBlur={handleBlur}>
+                            <div
+                                className="relative"
+                                onClick={() => setUserNavPanel(!userNavPanel)}
+                                onBlur={handleBlur}
+                            >
                                 <button className="h-12 w-12 mt-1">
-                                    <img src={profile_img} alt="Profile Image" className="w-full h-full object-cover rounded-full"/>
+                                    <img
+                                        src={profile_img}
+                                        alt="Profile Image"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
                                 </button>
 
-                                {userNavPanel ? <UserNavigationPanel/> : ""}
+                                {userNavPanel ? <UserNavigationPanel /> : ""}
                             </div>
                         </>
                     ) : (

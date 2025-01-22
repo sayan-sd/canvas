@@ -1,15 +1,17 @@
 import React, { useContext, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import lightLogo from "../../assets/logo-light.png";
+import darkLogo from "../../assets/logo-dark.png";
 import PageAnimationWrapper from "../common/PageAnimation";
-import defaultBanner from "../../assets/blog banner.png";
+import lightBanner from "../../assets/blog banner light.png"
+import darkBanner from "../../assets/blog banner dark.png"
 import { uploadImage } from "../../utils/uploadImage";
 import toast from "react-hot-toast";
 import { EditorContext } from "../../pages/Editor";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./BlogTools";
 import axios from "axios";
-import { UserContext } from "../../App";
+import { ThemeContext, UserContext } from "../../App";
 
 const BlogEditor = () => {
     // blog context
@@ -27,6 +29,9 @@ const BlogEditor = () => {
     if (userAuth != null) {
         access_token = userAuth.access_token;
     }
+
+    let { theme } = useContext(ThemeContext);
+
     let { blog_id } = useParams();
 
     const navigate = useNavigate();
@@ -89,7 +94,7 @@ const BlogEditor = () => {
         setBlog({ ...blog, title: input.value });
     };
 
-    // default banner
+    // default banner - shwo default banner
     const handleError = (e) => {
         let img = e.target;
         // console.log(img);
@@ -97,7 +102,7 @@ const BlogEditor = () => {
         // Add a small timeout to ensure proper handling of the image state
         setTimeout(() => {
             if (!img.complete || img.naturalHeight === 0) {
-                img.src = defaultBanner;
+                img.src = theme ==  'light' ? lightBanner : darkBanner;
             }
         }, 50);
     };
@@ -178,7 +183,7 @@ const BlogEditor = () => {
                         toast.success("Saved as Draft 👍");
 
                         setTimeout(() => {
-                            navigate("/");
+                            navigate("/dashboard/blogs?tab=draft");
                         }, 500);
                     })
                     .catch(({ response }) => {
@@ -197,7 +202,7 @@ const BlogEditor = () => {
             <nav className="navbar">
                 {/* logo image */}
                 <Link to={"/"} className="flex-none w-10">
-                    <img src={logo} alt="Canvas Logo" />
+                    <img src={theme == 'light' ? lightLogo : darkLogo} alt="Canvas Logo" />
                 </Link>
 
                 {/* blog title */}
@@ -249,7 +254,7 @@ const BlogEditor = () => {
                         <textarea
                             defaultValue={title}
                             placeholder="Blog Title"
-                            className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40"
+                            className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 bg-white"
                             onKeyDown={handleTitleKeyDown}
                             onChange={handleTitleChange}
                         ></textarea>

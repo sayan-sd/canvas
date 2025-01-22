@@ -13,6 +13,7 @@ const mailSender = require("../utils/mailSender");
 const generateUserName = require("./helper/authHelper/generateUserName");
 const { formatData } = require("./helper/authHelper/formatData");
 const { generateOTP, generateEmailTemplate } = require("../utils/otpUtils");
+const { generateForgotPasswordEmail } = require("../utils/forgotPasswordEmail");
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
@@ -44,7 +45,7 @@ exports.sendOTP = async (req, res) => {
         // Send email
         await mailSender(
             email,
-            "Verify Your Email",
+            "Your OTP Code from Canvas",
             generateEmailTemplate(otp)
         );
 
@@ -333,7 +334,7 @@ exports.forgotPassword = async (req, res) => {
 
         // send mail with reset link
         const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
-        await mailSender(email, "Password Reset", `Click here to reset your password: ${resetLink}`);
+        await mailSender(email, "Reset Your Password for Your Canvas Account", generateForgotPasswordEmail(resetLink));
         
         res.status(200).json({ success: true, message: "Password reset link sent." });
     } catch (error) {
@@ -358,6 +359,7 @@ exports.resetPassword = async (req, res) => {
         user.personal_info.password = await bcrypt.hash(password, 10);
         user.resetToken = undefined;
         user.tokenExpiry = undefined;
+        console.log(user.personal_info.password);
         await user.save();
 
         res.status(200).json({ success: true, message: "Password reset successful." });

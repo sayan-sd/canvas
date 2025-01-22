@@ -79,7 +79,7 @@ const Editor = () => {
                 setTextEditor,
             }}
         >
-            {access_token === null ? (
+            {access_token == undefined || null ? (
                 <Navigate to={"/signin"} />
             ) : loading ? (
                 <Loader />

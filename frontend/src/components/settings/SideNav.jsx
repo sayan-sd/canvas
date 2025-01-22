@@ -1,11 +1,16 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { UserContext } from "../../App";
+import Loader from "../common/Loader";
 
 const SideNav = () => {
+    const [isLoading, setIsLoading] = useState(true);
     let { userAuth } = useContext(UserContext);
-    let access_token;
-    if (userAuth != null) access_token = userAuth.access_token;
+    let access_token, new_notification_available;
+    if (userAuth != null) {
+        access_token = userAuth.access_token;
+        new_notification_available = userAuth.new_notification_available;
+    }
 
     let page = location.pathname.split("/")[2];
 
@@ -17,6 +22,18 @@ const SideNav = () => {
     let activeTabLine = useRef();
     let sideBarIconTab = useRef();
     let pageStateTab = useRef();
+
+    // Add effect to handle initial auth loading
+    useEffect(() => {
+        const checkAuth = () => {
+            // Wait a brief moment for auth to initialize
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 500);
+        };
+        
+        checkAuth();
+    }, []);
 
     const changePageState = (e) => {
         const target = e.currentTarget;
@@ -34,24 +51,35 @@ const SideNav = () => {
         }
     };
 
-    // run when page state is changed
-    // useEffect(() => {
-    //     // Initial click after mount
-    //     if (pageStateTab.current) {
-    //         pageStateTab.current.click();
-    //     }
-    // }, []); // Empty dependency array for mount only
-
     // useEffect(() => {
     //     setShowSideNav(false);
+    //     pageStateTab.current.click();
     // }, [pageState]);
 
     useEffect(() => {
         setShowSideNav(false);
-        pageStateTab.current.click();
+        
+        // Instead of triggering a click, directly call the logic
+        if (pageStateTab.current) {
+            const { offsetWidth, offsetLeft } = pageStateTab.current;
+            
+            if (activeTabLine.current) {
+                activeTabLine.current.style.width = `${offsetWidth}px`;
+                activeTabLine.current.style.left = `${offsetLeft}px`;
+            }
+        }
     }, [pageState]);
 
-    return access_token === undefined ? (
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
+
+    return (!isLoading && access_token === undefined) ? (
         <Navigate to={"/signin"} />
     ) : (
         <>
@@ -104,11 +132,18 @@ const SideNav = () => {
                         </NavLink>
 
                         <NavLink
-                            to={"/dashboard/notification"}
+                            to={"/dashboard/notifications"}
                             onClick={(e) => setPageState(e.target.innerText)}
                             className={"sidebar-link"}
                         >
-                            <i className="fi fi-rr-bell"></i>
+                            <div className="relative">
+                                <i className="fi fi-rr-bell"></i>
+                                {new_notification_available ? (
+                                    <span className="bg-red w-2 h-2 rounded-full absolute z-10 top-0 right-0"></span>
+                                ) : (
+                                    ""
+                                )}
+                            </div>
                             Notifications
                         </NavLink>
 
