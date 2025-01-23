@@ -10,6 +10,7 @@ import BlogContent from "../components/blog/BlogContent";
 import CommentsContainer, {
     fetchComments,
 } from "../components/blog/comment/CommentsContainer";
+import BlogDisplayPageSkeleton from "../components/blog/skeleton/BlogDisplayPageSkeleton";
 
 // empty blog structure
 export const blogStructure = {
@@ -95,7 +96,7 @@ const BlogDisplayPage = () => {
     return (
         <PageAnimationWrapper>
             {loading ? (
-                <Loader />
+                <BlogDisplayPageSkeleton />
             ) : (
                 <BlogContext.Provider
                     value={{

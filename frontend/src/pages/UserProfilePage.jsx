@@ -11,7 +11,6 @@ import BlogPostCard from "../components/blog/BlogPostCard";
 import NoDataMessage from "../components/common/NoDataMessage";
 import LoadMoreDataBtn from "../components/common/LoadMoreDataBtn";
 import PageNotFound404 from "./PageNotFound404";
-import BlogPostCardSkeleton from "../components/blog/skeleton/BlogPostCardSkeleton";
 
 export const profileDataStructure = {
     personal_info: {
@@ -171,7 +170,7 @@ const UserProfilePage = () => {
                         >
                             <>
                                 {blogs == null ? (
-                                    [...Array(3)].map((_, i) => <BlogPostCardSkeleton key={i} />)
+                                    <Loader />
                                 ) : blogs.results.length ? (
                                     blogs.results.map((blog, i) => {
                                         return (
