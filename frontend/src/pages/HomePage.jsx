@@ -5,7 +5,6 @@ import InpageNavigation, {
 } from "../components/home/InpageNavigation";
 import axios from "axios";
 import toast from "react-hot-toast";
-import Loader from "../components/common/Loader";
 import BlogPostCard from "../components/blog/BlogPostCard";
 import MinimalBlogPostCard from "../components/blog/MinimalBlogPostCard";
 import NoDataMessage from "../components/common/NoDataMessage";
