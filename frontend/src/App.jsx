@@ -15,7 +15,6 @@ import ChangePassword from "./pages/settings/ChangePassword";
 import EditProfile from "./pages/settings/EditProfile";
 import Notifications from "./pages/settings/Notifications";
 import ManageBlogs from "./pages/settings/ManageBlogs";
-import ScrollRestoration from "./components/common/ScrollRestoration";
 
 export const UserContext = createContext({});
 export const ThemeContext = createContext({});
@@ -51,7 +50,6 @@ function App() {
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>
             <UserContext.Provider value={{ userAuth, setUserAuth }}>
-                {/* <ScrollRestoration /> */}
                 <Routes>
                     {/* Write Blog Route */}
                     <Route path="/editor" element={<Editor />} />
