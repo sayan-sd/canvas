@@ -81,7 +81,20 @@ const Navbar = () => {
         <div>
             <nav className="navbar z-50">
                 {/* Logo */}
-                <Link to={"/"} className="flex-none w-10">
+                <Link
+                    to={"/"}
+                    className="flex-none w-10"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        
+                        navigate('/');
+        
+                        // Reset category if on home page
+                        if (window.homePageRef && window.homePageRef.resetCategory) {
+                            window.homePageRef.resetCategory();
+                        }
+                    }}
+                >
                     <img
                         src={theme == "light" ? lightLogo : darkLogo}
                         alt="C\anvas Logo"
@@ -117,7 +130,10 @@ const Navbar = () => {
                         <i className="i fi-rr-search text-xl"></i>
                     </button>
 
-                    <Link to={"/editor"} className="hidden md:flex gap-2 link hover:rounded-md">
+                    <Link
+                        to={"/editor"}
+                        className="hidden md:flex gap-2 link hover:rounded-md"
+                    >
                         <p>Write</p>
                         <i className="fi fi-rr-file-edit"></i>
                     </Link>

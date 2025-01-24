@@ -128,7 +128,7 @@ const EditProfile = () => {
             bio,
             linkedin,
             facebook,
-            twitter,
+            x,
             github,
             instagram,
             website,
@@ -159,7 +159,7 @@ const EditProfile = () => {
                     social_links: {
                         linkedin,
                         facebook,
-                        twitter,
+                        x,
                         github,
                         instagram,
                         website,
@@ -303,6 +303,7 @@ const EditProfile = () => {
                                             value={link}
                                             placeholder={"https://"}
                                             icon={
+                                                key == 'x' ? ' fi-brands-twitter-alt' :
                                                 key != "website"
                                                     ? " fi-brands-" + key
                                                     : "globe"

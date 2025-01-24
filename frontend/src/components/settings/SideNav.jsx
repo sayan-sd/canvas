@@ -79,7 +79,7 @@ const SideNav = () => {
         );
     }
 
-    return (!isLoading && access_token === undefined) ? (
+    return (!isLoading && access_token == undefined) ? (
         <Navigate to={"/signin"} />
     ) : (
         <>
