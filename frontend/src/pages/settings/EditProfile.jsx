@@ -88,7 +88,6 @@ const EditProfile = () => {
                         }
                     )
                     .then(({ data }) => {
-                        console.log(data.profile_img);
                         let newUserAuth = {
                             ...userAuth,
                             profile_img: data.profile_img,
@@ -122,7 +121,6 @@ const EditProfile = () => {
         for (let [key, value] of form.entries()) {
             formData[key] = value;
         }
-        console.log(formData);
 
         let {
             fullname,
@@ -207,7 +205,7 @@ const EditProfile = () => {
                                 htmlFor="uploadImg"
                                 className=" relative block w-48 h-48 bg-grey rounded-full overflow-hidden"
                             >
-                                <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white bg-black/40 opacity-0 hover:opacity-100 cursor-pointer">
+                                <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white bg-black/40  cursor-pointer">
                                     Upload Image
                                 </div>
                                 <img

@@ -15,6 +15,11 @@ body[data-theme="dark"] .ce-toolbar__plus path,
     color: #f3f3f3;
 }
 
+body[data-theme="light"] .ce-toolbar__plus path,
+.ce-toolbar__settings-btn path {
+    color: black;
+}
+
 body[data-theme="dark"] .codex-popover__item {
     color: #f3f3f3;
 }
