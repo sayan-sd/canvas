@@ -202,7 +202,7 @@ const UserProfilePage = () => {
                                 />
                             </>
 
-                            {/* trending blogs */}
+                            {/* about user */}
                             <AboutUser
                                 bio={bio.length ? bio : "Hey there! Check out my stories on Canvas!"}
                                 social_links={social_links}
