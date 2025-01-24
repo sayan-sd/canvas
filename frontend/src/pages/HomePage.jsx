@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import PageAnimationWrapper from "../components/common/PageAnimation";
 import InpageNavigation, {
     activeTabRef,
@@ -19,6 +19,14 @@ const HomePage = () => {
     const [pageState, setPageState] = useState("home");
     const [loading, setLoading] = useState(false);
 
+    // Create a ref to expose reset functionality
+    const homePageRef = useRef({
+        resetCategory: () => {
+            setBlogs(null);
+            setPageState("home");
+        }
+    });
+
     const categories = [
         "technology",
         "lifestyle",
@@ -27,7 +35,7 @@ const HomePage = () => {
         "health",
         "travel",
         "adventure",
-        "hollywood",
+        "programming",
     ];
 
     // latest blogs
@@ -113,6 +121,11 @@ const HomePage = () => {
         }
     }, [blogs, loading, pageState]);
 
+    // Expose the ref to window or pass it through context if needed
+    useEffect(() => {
+        window.homePageRef = homePageRef.current;
+    }, []);
+
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -131,6 +144,7 @@ const HomePage = () => {
         if (!trendingBlogs) {
             fetchTrendingBlogs();
         }
+        window.scrollTo(0, 0);
     }, [pageState]);
 
     const loadBlogByCategory = (e) => {

@@ -11,6 +11,8 @@ import BlogPostCard from "../components/blog/BlogPostCard";
 import NoDataMessage from "../components/common/NoDataMessage";
 import LoadMoreDataBtn from "../components/common/LoadMoreDataBtn";
 import PageNotFound404 from "./PageNotFound404";
+import UserProfilePageSkeleton from "../components/user/skeleton/UserProfilePageSkeleton";
+import BlogPostCardSkeleton from "../components/blog/skeleton/BlogPostCardSkeleton";
 
 export const profileDataStructure = {
     personal_info: {
@@ -118,7 +120,7 @@ const UserProfilePage = () => {
     return (
         <PageAnimationWrapper>
             {loading ? (
-                <Loader />
+                <UserProfilePageSkeleton />
             ) : profile_username.length ? (
                 <section className="h-cover md:flex flex-row-reverse items-start gap-5 min-[1100px]:gap-12">
                     {/* User Profile Info */}
@@ -170,7 +172,7 @@ const UserProfilePage = () => {
                         >
                             <>
                                 {blogs == null ? (
-                                    <Loader />
+                                    [...Array(2)].map((_, i) => <BlogPostCardSkeleton key={i} />)
                                 ) : blogs.results.length ? (
                                     blogs.results.map((blog, i) => {
                                         return (

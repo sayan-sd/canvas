@@ -2,7 +2,6 @@ import React, { createContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import PageAnimationWrapper from "../components/common/PageAnimation";
-import Loader from "../components/common/Loader";
 import { getDay } from "../utils/DateFormatter";
 import BlogInteraction from "../components/blog/BlogInteraction";
 import BlogPostCard from "../components/blog/BlogPostCard";
@@ -82,6 +81,7 @@ const BlogDisplayPage = () => {
     useEffect(() => {
         resetState();
         fetchBlog();
+        window.scrollTo(0, 0);
     }, [blog_id]);
 
     const resetState = () => {
