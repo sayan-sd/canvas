@@ -38,7 +38,7 @@ const BlogEditor = () => {
 
     // create editor
     useEffect(() => {
-        if (!textEditor.isReady) {
+        // if (!textEditor.isReady) {
             setTextEditor(
                 new EditorJS({
                     holder: "textEditor",
@@ -47,7 +47,7 @@ const BlogEditor = () => {
                     placeholder: "Let's write an awesome story...",
                 })
             );
-        }
+        // }
     }, []);
 
     // upload blog banner preview

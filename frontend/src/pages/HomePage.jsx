@@ -19,14 +19,6 @@ const HomePage = () => {
     const [pageState, setPageState] = useState("home");
     const [loading, setLoading] = useState(false);
 
-    // Create a ref to expose reset functionality
-    const homePageRef = useRef({
-        resetCategory: () => {
-            setBlogs(null);
-            setPageState("home");
-        }
-    });
-
     const categories = [
         "technology",
         "lifestyle",
@@ -39,18 +31,20 @@ const HomePage = () => {
     ];
 
     // latest blogs
-    const fetchLatestBlogs = async ({page = 1}) => {
+    const fetchLatestBlogs = async ({ page = 1 }) => {
         if (loading) return;
         setLoading(true);
-        
+
         axios
-            .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/latest-blogs", {page})
+            .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/latest-blogs", {
+                page,
+            })
             .then(async ({ data }) => {
                 let formatedData = await filterPaginationData({
                     state: blogs,
                     data: data.blogs,
                     page,
-                    countRoute: "/blogs/all-latest-blogs-count"
+                    countRoute: "/blogs/all-latest-blogs-count",
                 });
                 setBlogs(formatedData);
                 setLoading(false);
@@ -74,13 +68,14 @@ const HomePage = () => {
     };
 
     // blogs by category
-    const fetchBlogsByCategory = async ({page = 1}) => {
+    const fetchBlogsByCategory = async ({ page = 1 }) => {
         if (loading) return;
         setLoading(true);
 
         axios
             .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/search-blogs", {
-                tag: pageState, page
+                tag: pageState,
+                page,
             })
             .then(async ({ data }) => {
                 let formatedData = await filterPaginationData({
@@ -88,7 +83,7 @@ const HomePage = () => {
                     data: data.blogs,
                     page,
                     countRoute: "/blogs/search-blogs-count",
-                    data_to_send: {tag: pageState}
+                    data_to_send: { tag: pageState },
                 });
                 setBlogs(formatedData);
                 setLoading(false);
@@ -107,9 +102,9 @@ const HomePage = () => {
 
         // Check if we're near bottom and have more content to load
         if (
-            !loading && 
-            blogs?.totalDocs > blogs?.results.length && 
-            scrollTop + clientHeight >= scrollHeight - 1
+            !loading &&
+            blogs?.totalDocs > blogs?.results.length &&
+            scrollTop + clientHeight >= scrollHeight - 100
             // scrollTop + clientHeight >= scrollHeight - 500
         ) {
             const nextPage = blogs.page + 1;
@@ -124,11 +119,11 @@ const HomePage = () => {
     // Expose the ref to window or pass it through context if needed
     useEffect(() => {
         window.homePageRef = homePageRef.current;
-    }, []);
+    }, [pageState]);
 
     useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
     useEffect(() => {
@@ -136,9 +131,9 @@ const HomePage = () => {
         activeTabRef.current.click();
 
         if (pageState == "home") {
-            fetchLatestBlogs({page: 1});
+            fetchLatestBlogs({ page: 1 });
         } else {
-            fetchBlogsByCategory({page: 1});
+            fetchBlogsByCategory({ page: 1 });
         }
 
         if (!trendingBlogs) {
@@ -146,6 +141,20 @@ const HomePage = () => {
         }
         window.scrollTo(0, 0);
     }, [pageState]);
+
+    // Directly create the ref
+    const homePageRef = useRef({
+        resetCategory: () => {
+            // Use functional update to ensure correct state
+            setPageState((currentState) => {
+                if (currentState != "home") {
+                    setBlogs(null);
+                    setPageState("home");
+                }
+                return "home";
+            });
+        },
+    });
 
     const loadBlogByCategory = (e) => {
         const category = e.target.innerText.toLowerCase();
@@ -171,7 +180,9 @@ const HomePage = () => {
                     >
                         <>
                             {blogs == null ? (
-                                [...Array(5)].map((_, i) => <BlogPostCardSkeleton key={i} />)
+                                [...Array(5)].map((_, i) => (
+                                    <BlogPostCardSkeleton key={i} />
+                                ))
                             ) : blogs.results.length ? (
                                 <>
                                     {blogs.results.map((blog, i) => {
@@ -186,16 +197,20 @@ const HomePage = () => {
                                                 <BlogPostCard
                                                     content={blog}
                                                     author={
-                                                        blog.author.personal_info
+                                                        blog.author
+                                                            .personal_info
                                                     }
                                                 />
                                             </PageAnimationWrapper>
                                         );
                                     })}
-                                    
+
                                     {/* Show loading indicator when fetching more */}
-                                    {loading && [...Array(3)].map((_, i) => <BlogPostCardSkeleton key={i} />)}
-                                    
+                                    {loading &&
+                                        [...Array(3)].map((_, i) => (
+                                            <BlogPostCardSkeleton key={i} />
+                                        ))}
+
                                     {/* Keep the load more button visible but data will load automatically */}
                                     <LoadMoreDataBtn
                                         state={blogs}
@@ -213,9 +228,10 @@ const HomePage = () => {
 
                         {/* trending blogs */}
                         {trendingBlogs == null ? (
-                            [...Array(5)].map((_, i) => <MinimalBlogPostCardSkeleton key={i} />)
-                        ) : (
-                            trendingBlogs.length ? 
+                            [...Array(5)].map((_, i) => (
+                                <MinimalBlogPostCardSkeleton key={i} />
+                            ))
+                        ) : trendingBlogs.length ? (
                             trendingBlogs.map((blog, i) => {
                                 return (
                                     <PageAnimationWrapper
@@ -231,7 +247,11 @@ const HomePage = () => {
                                         />
                                     </PageAnimationWrapper>
                                 );
-                            }) : <NoDataMessage message={"No trending blogs found"} />
+                            })
+                        ) : (
+                            <NoDataMessage
+                                message={"No trending blogs found"}
+                            />
                         )}
                     </InpageNavigation>
                 </div>
@@ -273,9 +293,10 @@ const HomePage = () => {
 
                             {/* trending blogs */}
                             {trendingBlogs == null ? (
-                                [...Array(5)].map((_, i) => <MinimalBlogPostCardSkeleton key={i} />)
-                            ) : (
-                                trendingBlogs.length ? 
+                                [...Array(5)].map((_, i) => (
+                                    <MinimalBlogPostCardSkeleton key={i} />
+                                ))
+                            ) : trendingBlogs.length ? (
                                 trendingBlogs.map((blog, i) => {
                                     return (
                                         <PageAnimationWrapper
@@ -291,7 +312,11 @@ const HomePage = () => {
                                             />
                                         </PageAnimationWrapper>
                                     );
-                                }) : <NoDataMessage message={"No trending blogs found"} />
+                                })
+                            ) : (
+                                <NoDataMessage
+                                    message={"No trending blogs found"}
+                                />
                             )}
                         </div>
                     </div>
