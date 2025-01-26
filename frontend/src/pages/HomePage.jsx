@@ -104,7 +104,7 @@ const HomePage = () => {
         if (
             !loading &&
             blogs?.totalDocs > blogs?.results.length &&
-            scrollTop + clientHeight >= scrollHeight - 100
+            scrollTop + clientHeight >= scrollHeight - 200
             // scrollTop + clientHeight >= scrollHeight - 500
         ) {
             const nextPage = blogs.page + 1;
