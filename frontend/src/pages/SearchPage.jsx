@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { data, useParams } from "react-router-dom";
-import InpageNavigation, { activeTabRef } from "../components/home/InpageNavigation";
+import InpageNavigation, {
+    activeTabRef,
+} from "../components/home/InpageNavigation";
 import Loader from "../components/common/Loader";
 import BlogPostCard from "../components/blog/BlogPostCard";
 import NoDataMessage from "../components/common/NoDataMessage";
@@ -9,6 +11,8 @@ import axios from "axios";
 import { filterPaginationData } from "../components/home/FilterPaginationData";
 import PageAnimationWrapper from "../components/common/PageAnimation";
 import UserCard from "../components/user/UserCard";
+import BlogPostCardSkeleton from "../components/blog/skeleton/BlogPostCardSkeleton";
+import UserCardSkeleton from "../components/user/skeleton/UserCardSkeleton";
 
 const SearchPage = () => {
     let { query } = useParams();
@@ -72,22 +76,28 @@ const SearchPage = () => {
     const UserCardWrapper = () => {
         return (
             <>
-                {users == null ? <Loader /> : 
-                        users.length ? 
-                        users.map((user, i) => {
-                            return <PageAnimationWrapper key={i} transition={{duration: 1, delay: i * 0.08}}>
-                                    <UserCard user={user}/>
-                                </PageAnimationWrapper>
-                            }) 
-                        : <NoDataMessage message={"No user found"}/>
-                }
+                {users == null ? (
+                    [...Array(2)].map((_, i) => <UserCardSkeleton key={i} />)
+                ) : users.length ? (
+                    users.map((user, i) => {
+                        return (
+                            <PageAnimationWrapper
+                                key={i}
+                                transition={{ duration: 1, delay: i * 0.08 }}
+                            >
+                                <UserCard user={user} />
+                            </PageAnimationWrapper>
+                        );
+                    })
+                ) : (
+                    <NoDataMessage message={"No user found"} />
+                )}
             </>
-        )
-    }
+        );
+    };
 
     return (
         <section className="h-cover flex justify-center gap-10">
-
             {/* small screen */}
             <div className="w-full">
                 {/* search & account navigation */}
@@ -101,7 +111,9 @@ const SearchPage = () => {
                     {/* Blogs Search Data */}
                     <>
                         {blogs == null ? (
-                            <Loader />
+                            [...Array(3)].map((_, i) => (
+                                <BlogPostCardSkeleton key={i} />
+                            ))
                         ) : blogs.results.length ? (
                             blogs.results.map((blog, i) => {
                                 return (
@@ -132,7 +144,6 @@ const SearchPage = () => {
 
                     {/* Users Search Data */}
                     <UserCardWrapper />
-
                 </InpageNavigation>
             </div>
 

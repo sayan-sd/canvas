@@ -6,13 +6,26 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 const BlogInteraction = () => {
-    let { blog, setBlog, isLikedByUser, setIsLikedByUser, commentsWrapper, setCommentsWrapper } =
-        useContext(BlogContext);
-    let blog_id, _id, title, total_likes, total_comments, author_username, activity;
-    
+    let {
+        blog,
+        setBlog,
+        isLikedByUser,
+        setIsLikedByUser,
+        commentsWrapper,
+        setCommentsWrapper,
+    } = useContext(BlogContext);
+    let blog_id,
+        _id,
+        title,
+        total_likes,
+        total_comments,
+        author_username,
+        activity;
+
     const [showSharePopup, setShowSharePopup] = useState(false);
     const shareButtonRef = useRef(null);
     const sharePopupRef = useRef(null);
+    const [popupPosition, setPopupPosition] = useState("bottom");
 
     if (blog != null) {
         blog_id = blog.blog_id;
@@ -44,11 +57,31 @@ const BlogInteraction = () => {
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    // determine the share popup position
+    useEffect(() => {
+        const determinePopupPosition = () => {
+            if (!shareButtonRef.current || !sharePopupRef.current) return;
+    
+            const buttonRect = shareButtonRef.current.getBoundingClientRect();
+            const popupRect = sharePopupRef.current.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+    
+            setPopupPosition(
+                windowHeight - buttonRect.bottom >= popupRect.height ? 'bottom' : 'top'
+            );
+        };
+    
+        if (showSharePopup) {
+            // Use microtask to ensure DOM is updated before calculation
+            Promise.resolve().then(determinePopupPosition);
+        }
+    }, [showSharePopup]);
 
     useEffect(() => {
         // check if user has liked the blog
@@ -102,12 +135,13 @@ const BlogInteraction = () => {
     };
 
     const copyLinkToClipboard = () => {
-        navigator.clipboard.writeText(window.location.href)
+        navigator.clipboard
+            .writeText(window.location.href)
             .then(() => {
                 toast.success("Link copied to clipboard");
                 setShowSharePopup(false);
             })
-            .catch(err => {
+            .catch((err) => {
                 toast.error("Failed to copy link");
                 console.error(err);
             });
@@ -116,7 +150,7 @@ const BlogInteraction = () => {
     const shareOnX = () => {
         window.open(
             `https://x.com/intent/tweet?text=Read ${title}&url=${window.location.href}`,
-            '_blank'
+            "_blank"
         );
         setShowSharePopup(false);
     };
@@ -124,8 +158,10 @@ const BlogInteraction = () => {
     const shareOnLinkedIn = () => {
         window.open(
             // `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`,
-            `https://www.linkedin.com/feed/?linkOrigin=LI_BADGE&shareActive=true&shareUrl=${encodeURIComponent(window.location.href)}`,
-            '_blank'
+            `https://www.linkedin.com/feed/?linkOrigin=LI_BADGE&shareActive=true&shareUrl=${encodeURIComponent(
+                window.location.href
+            )}`,
+            "_blank"
         );
         setShowSharePopup(false);
     };
@@ -154,7 +190,10 @@ const BlogInteraction = () => {
                     <p className="text-xl text-dark-grey">{total_likes}</p>
 
                     {/* comment */}
-                    <button className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80" onClick={() => setCommentsWrapper(!commentsWrapper)}>
+                    <button
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80"
+                        onClick={() => setCommentsWrapper(!commentsWrapper)}
+                    >
                         <i className="fi fi-rr-comment-dots flex items-center justify-center" />
                     </button>
                     <p className="text-xl text-dark-grey">{total_comments}</p>
@@ -175,35 +214,37 @@ const BlogInteraction = () => {
 
                     {/* share button */}
                     <div className="relative">
-                        <button 
+                        <button
                             ref={shareButtonRef}
                             className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80"
                             onClick={handleShareClick}
                         >
                             <i className="fi fi-rr-share text-xl flex items-center justify-center"></i>
                         </button>
-                        
+
                         {showSharePopup && (
-                            <div 
+                            <div
                                 ref={sharePopupRef}
-                                className="absolute right-0 top-full mt-2 w-52 bg-white border-2 border-grey rounded-lg shadow-lg z-10"
+                                className={
+                                    `absolute right-0 w-52 bg-white border-2 border-grey rounded-lg shadow-lg z-10 ${popupPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'}`
+                                }
                             >
                                 <ul>
-                                    <li 
+                                    <li
                                         className="px-4 py-2 hover:bg-grey cursor-pointer border-b border-grey flex items-center gap-3"
                                         onClick={copyLinkToClipboard}
                                     >
                                         <i className="fi fi-rr-link-alt"></i>
                                         Copy Link
                                     </li>
-                                    <li 
+                                    <li
                                         className="px-4 py-2 hover:bg-grey cursor-pointer flex items-center gap-3"
                                         onClick={shareOnX}
                                     >
                                         <i className="fi fi-brands-twitter-alt-square mt-1"></i>
                                         Share on X
                                     </li>
-                                    <li 
+                                    <li
                                         className="px-4 py-2 hover:bg-grey cursor-pointer flex items-center gap-3"
                                         onClick={shareOnLinkedIn}
                                     >

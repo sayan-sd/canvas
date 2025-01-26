@@ -27,7 +27,7 @@ const CommentField = ({ action, index = undefined, replyingTo = undefined, setRe
     const handleComment = () => {
         // validate data
         if (!access_token) {
-            return toast.error("Please sign in first");
+            return toast.error("Please login first");
         }
         if (!comment.length) {
             return toast.error("Please enter a comment");
