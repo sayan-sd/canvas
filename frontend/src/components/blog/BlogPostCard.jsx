@@ -1,6 +1,6 @@
 import React from "react";
 import { getDay } from "../../utils/DateFormatter";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BlogPostCard = ({ content, author }) => {
     const {
@@ -9,10 +9,12 @@ const BlogPostCard = ({ content, author }) => {
         title,
         des,
         banner,
-        activity: { total_likes },
+        activity: { total_likes, total_comments },
         blog_id: id,
     } = content;
     const { fullname, username, profile_img } = author;
+    const navigate = useNavigate();
+    const isTagPage = location.pathname.startsWith('/tag/');
 
     return (
         <Link
@@ -29,35 +31,67 @@ const BlogPostCard = ({ content, author }) => {
                         className="w-6 h-6 rounded-full"
                     />
                     <p className="line-clamp-1">
-                        {fullname} @{username}
+                        In{" "}
+                        <span
+                            className="capitalize hover:underline font-medium"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate(`/tag/${tags[0]}`);
+                            }}
+                        >
+                            {tags[0]}
+                        </span>{" "}
+                        by{" "}
+                        <span
+                            className="hover:underline font-medium"
+                            to={`/user/${username}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate(`/user/${username}`);
+                            }}
+                        >
+                            {fullname}
+                        </span>
                     </p>
-                    <p className="min-w-fit">{getDay(publishedAt)}</p>
+                    <p className="min-w-fit hidden sm:inline-block">
+                        {getDay(publishedAt)}
+                    </p>
                 </div>
 
                 {/* title */}
                 <h1 className="blog-title">{title}</h1>
 
                 {/* blog description */}
-                <p className="my-3 text-xl font-gelasio left-7 max-sm:hidden md:max-[1100px]:hidden line-clamp-2">
+                <p className={`my-3 text-xl font-gelasio max-sm:hidden left-7 line-clamp-2 ${isTagPage ? "" : "md:max-[1100px]:hidden"}`}>
                     {des}
                 </p>
 
                 {/* tag & like count */}
-                <div className="flex gap-4 mt-7">
-                    <span className="btn-light py-1 px-4">{tags[0]}</span>
-                    <span className="ml-3 flex items-center gap-2 text-dark-grey">
-                        <i className="fi fi-sr-heart text-xl"></i>
-                        {total_likes}
-                    </span>
+                <div className="flex items-center justify-between mt-7 font-medium">
+                    <div className="flex gap-4">
+                        <span className="ml-3 flex items-center gap-2 text-dark-grey">
+                            <i className="fi fi-sr-heart text-xl"></i>
+                            {total_likes}
+                        </span>
+                        <span className="ml-3 flex items-center gap-2 text-dark-grey">
+                            <i className="fi fi-sr-comment-dots text-xl"></i>
+                            {total_comments}
+                        </span>
+                    </div>
+
+                    <i className="fi fi-rr-bookmark md:mr-8 text-xl"></i>
                 </div>
             </div>
 
             {/* blog banner */}
-            <div className="h-28 aspect-square bg-grey">
+            <div
+                className="h-28 
+            aspect-video bg-grey max-sm:aspect-square md:max-[1100px]:aspect-square"
+            >
                 <img
                     src={banner}
                     alt="Blog Banner"
-                    className="w-full h-full aspect-square object-cover"
+                    className="w-full h-full object-cover aspect-video max-sm:aspect-square md:max-[1100px]:aspect-square"
                 />
             </div>
         </Link>

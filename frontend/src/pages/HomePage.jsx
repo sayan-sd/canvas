@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import PageAnimationWrapper from "../components/common/PageAnimation";
 import InpageNavigation, {
     activeTabRef,
@@ -12,12 +12,18 @@ import { filterPaginationData } from "../components/home/FilterPaginationData";
 import LoadMoreDataBtn from "../components/common/LoadMoreDataBtn";
 import BlogPostCardSkeleton from "../components/blog/skeleton/BlogPostCardSkeleton";
 import MinimalBlogPostCardSkeleton from "../components/blog/skeleton/MinimalBlogPostCardSkeleton";
+import { useNavigate } from "react-router-dom";
+import Loader from "../components/common/Loader";
+import UserCard from "../components/user/UserCard";
+import UserCardSkeleton from "../components/user/skeleton/UserCardSkeleton";
 
 const HomePage = () => {
     const [blogs, setBlogs] = useState(null);
     const [trendingBlogs, setTrendingBlogs] = useState(null);
     const [pageState, setPageState] = useState("home");
     const [loading, setLoading] = useState(false);
+    const [users, setUsers] = useState(null);
+    const navigate = useNavigate();
 
     const categories = [
         "technology",
@@ -67,31 +73,21 @@ const HomePage = () => {
             });
     };
 
-    // blogs by category
-    const fetchBlogsByCategory = async ({ page = 1 }) => {
-        if (loading) return;
-        setLoading(true);
-
+    // top users
+    const fetchUsers = async () => {
         axios
-            .post(import.meta.env.VITE_SERVER_DOMAIN + "/blogs/search-blogs", {
-                tag: pageState,
-                page,
-            })
-            .then(async ({ data }) => {
-                let formatedData = await filterPaginationData({
-                    state: blogs,
-                    data: data.blogs,
-                    page,
-                    countRoute: "/blogs/search-blogs-count",
-                    data_to_send: { tag: pageState },
-                });
-                setBlogs(formatedData);
-                setLoading(false);
+            .get(import.meta.env.VITE_SERVER_DOMAIN + "/users/whom-to-follow")
+            .then(({ data }) => {
+                setUsers(data);
             })
             .catch((err) => {
                 toast.error(err.message);
-                setLoading(false);
             });
+    };
+
+    // blogs by category
+    const fetchBlogsByCategory = async () => {
+        navigate(`/tag/${pageState}`);
     };
 
     // Auto load more handler
@@ -100,7 +96,7 @@ const HomePage = () => {
         const scrollTop = window.scrollY;
         const clientHeight = window.innerHeight;
 
-        // Check if we're near bottom and have more content to load
+        // Check if near bottom and have more content to load
         if (
             !loading &&
             blogs?.totalDocs > blogs?.results.length &&
@@ -116,11 +112,6 @@ const HomePage = () => {
         }
     }, [blogs, loading, pageState]);
 
-    // Expose the ref to window or pass it through context if needed
-    useEffect(() => {
-        window.homePageRef = homePageRef.current;
-    }, [pageState]);
-
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
@@ -133,28 +124,17 @@ const HomePage = () => {
         if (pageState == "home") {
             fetchLatestBlogs({ page: 1 });
         } else {
-            fetchBlogsByCategory({ page: 1 });
+            fetchBlogsByCategory();
         }
 
         if (!trendingBlogs) {
             fetchTrendingBlogs();
         }
+        if (users == null) {
+            fetchUsers();
+        }
         window.scrollTo(0, 0);
     }, [pageState]);
-
-    // Directly create the ref
-    const homePageRef = useRef({
-        resetCategory: () => {
-            // Use functional update to ensure correct state
-            setPageState((currentState) => {
-                if (currentState != "home") {
-                    setBlogs(null);
-                    setPageState("home");
-                }
-                return "home";
-            });
-        },
-    });
 
     const loadBlogByCategory = (e) => {
         const category = e.target.innerText.toLowerCase();
@@ -257,33 +237,8 @@ const HomePage = () => {
                 </div>
 
                 {/* filter and trending blogs(lg) */}
-                <div className="min-w-[40%] lg:min-w-[400px] max-w-min border-l border-grey pl-8 pt-3 max-md:hidden">
+                <div className="min-w-[40%] lg:min-w-[400px] max-w-min border-l border-grey pl-10 pt-3 max-md:hidden">
                     <div className="flex flex-col gap-10">
-                        {/* categories (tags) */}
-                        <div>
-                            <h1 className="font-medium text-xl mb-8">
-                                Stories from all interests
-                            </h1>
-
-                            <div className="flex gap-3 flex-wrap">
-                                {categories.map((category, i) => {
-                                    return (
-                                        <button
-                                            className={`tag ${
-                                                pageState == category
-                                                    ? "bg-black text-white"
-                                                    : ""
-                                            }`}
-                                            key={i}
-                                            onClick={loadBlogByCategory}
-                                        >
-                                            {category}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
                         {/* trending sec: lg */}
                         <div>
                             <h1 className="font-medium text-xl mb-8">
@@ -318,6 +273,78 @@ const HomePage = () => {
                                     message={"No trending blogs found"}
                                 />
                             )}
+                        </div>
+
+                        {/* categories (tags) */}
+                        <div>
+                            <h1 className="font-medium text-xl mb-8">
+                                Recommended topics
+                            </h1>
+
+                            <div className="flex gap-3 flex-wrap">
+                                {categories.map((category, i) => {
+                                    return (
+                                        <button
+                                            className={`tag ${
+                                                pageState == category
+                                                    ? "bg-black text-white"
+                                                    : ""
+                                            }`}
+                                            key={i}
+                                            onClick={loadBlogByCategory}
+                                        >
+                                            {category}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* whome to follow */}
+                        <div className="mt-8 hidden md:inline-block">
+                            <h1 className="font-medium text-xl mb-8">
+                                Top Storyteller for you
+                            </h1>
+
+                            <div className="gap-3 flex-col flex">
+                                {users == null ? (
+                                    [...Array(3)].map((_, i) => (
+                                        <UserCardSkeleton key={i} />
+                                    ))
+                                ) : users.length ? (
+                                    users.map((user, i) => {
+                                        return (
+                                            <PageAnimationWrapper
+                                                key={i}
+                                                transition={{
+                                                    duration: 1,
+                                                    delay: i * 0.08,
+                                                }}
+                                            >
+                                                <UserCard user={user} />
+                                            </PageAnimationWrapper>
+                                        );
+                                    })
+                                ) : (
+                                    <NoDataMessage message={"No user found"} />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* reading list */}
+                        <div className="hidden lg:inline-block mt-2">
+                            <h1 className="font-medium text-xl mb-4">
+                                Top Storyteller for you
+                            </h1>
+
+                            <p className="text-lg leading-6">
+                                Click the{" "}
+                                <span className="font-bold">
+                                    <i className="fi fi-rr-bookmark"></i>
+                                </span>{" "}
+                                on any story to easily add it to your
+                                reading list or a custom list  for better organization.
+                            </p>
                         </div>
                     </div>
                 </div>

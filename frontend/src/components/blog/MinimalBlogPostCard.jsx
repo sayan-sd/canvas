@@ -21,7 +21,7 @@ const MinimalBlogPostCard = ({ blog, index }) => {
 
             <div>
                 {/* username + published at */}
-                <div className="flex gap-2 items-center mb-7">
+                <div className="flex gap-2 items-center mb-4">
                     <img
                         src={profile_img}
                         alt="User Profile Image"
@@ -34,7 +34,7 @@ const MinimalBlogPostCard = ({ blog, index }) => {
                 </div>
 
                 {/* blog title */}
-                <h1 className="blog-title">{title}</h1>
+                <h1 className="blog-title lg:text-xl font-medium">{title}</h1>
             </div>
         </Link>
     );

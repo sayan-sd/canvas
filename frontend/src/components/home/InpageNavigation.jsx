@@ -41,6 +41,7 @@ const InpageNavigation = ({
                 setWidth(window.innerWidth);
             })
         }
+        activeTabRef.current?.click();
     }, [width]);
 
     return (

@@ -84,16 +84,6 @@ const Navbar = () => {
                 <Link
                     to={"/"}
                     className="flex-none w-10"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        
-                        navigate('/');
-        
-                        // Reset category if on home page
-                        if (window.homePageRef && window.homePageRef.resetCategory) {
-                            window.homePageRef.resetCategory();
-                        }
-                    }}
                 >
                     <img
                         src={theme == "light" ? lightLogo : darkLogo}

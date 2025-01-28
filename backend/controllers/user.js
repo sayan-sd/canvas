@@ -339,7 +339,7 @@ exports.deleteBlog = async (req, res) => {
 
         // First find the blog to make sure it exists and to get its _id
         const blog = await Blog.findOne({ blog_id });
-        
+
         if (!blog) {
             return res.status(404).json({ message: "Blog not found" });
         }
@@ -348,34 +348,54 @@ exports.deleteBlog = async (req, res) => {
         await Promise.all([
             // Delete the blog
             Blog.findOneAndDelete({ blog_id }),
-            
+
             // Delete related notifications
             Notification.deleteMany({ blog: blog._id }),
-            
+
             // Delete related comments
             Comment.deleteMany({ blog_id: blog._id }),
-            
+
             // Update user
             User.findOneAndUpdate(
                 { _id: user_id },
                 {
                     $pull: { blogs: blog._id },
-                    $inc: { "account_info.total_posts": -1 }
+                    $inc: { "account_info.total_posts": -1 },
                 }
-            )
+            ),
         ]);
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
-            message: "Blog deleted successfully" 
+            message: "Blog deleted successfully",
         });
-
     } catch (err) {
         console.error("Delete blog error:", err);
-        return res.status(500).json({ 
+        return res.status(500).json({
             success: false,
             message: "Server error while deleting blog",
-            error: err.message 
+            error: err.message,
+        });
+    }
+};
+
+// Get top 3 user with max read count
+exports.getWhomeToFollow = async (req, res) => {
+    const maxLimit = 3;
+    try {
+        const users = await User.find()
+            .sort({ "account_info.total_reads": -1 })
+            .limit(maxLimit)
+            .select(
+                "personal_info.fullname personal_info.username personal_info.profile_img -_id"
+            );
+        res.json(users);
+    } catch (err) {
+        console.error("Get top 3 users error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching top 3 users",
+            error: err.message,
         });
     }
 };
