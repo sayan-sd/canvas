@@ -31,7 +31,7 @@ const SideNav = () => {
                 setIsLoading(false);
             }, 500);
         };
-        
+
         checkAuth();
     }, []);
 
@@ -58,11 +58,11 @@ const SideNav = () => {
 
     useEffect(() => {
         setShowSideNav(false);
-        
+
         // Instead of triggering a click, directly call the logic
         if (pageStateTab.current) {
             const { offsetWidth, offsetLeft } = pageStateTab.current;
-            
+
             if (activeTabLine.current) {
                 activeTabLine.current.style.width = `${offsetWidth}px`;
                 activeTabLine.current.style.left = `${offsetLeft}px`;
@@ -79,7 +79,7 @@ const SideNav = () => {
         );
     }
 
-    return (!isLoading && access_token == undefined) ? (
+    return !isLoading && access_token == undefined ? (
         <Navigate to={"/signin"} />
     ) : (
         <>
@@ -145,6 +145,15 @@ const SideNav = () => {
                                 )}
                             </div>
                             Notifications
+                        </NavLink>
+
+                        <NavLink
+                            to={"/dashboard/bookmarks"}
+                            onClick={(e) => setPageState(e.target.innerText)}
+                            className={"sidebar-link"}
+                        >
+                            <i className="fi fi-rr-book-bookmark"></i>
+                            Bookmarks
                         </NavLink>
 
                         <NavLink

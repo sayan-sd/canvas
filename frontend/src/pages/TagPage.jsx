@@ -83,12 +83,13 @@ const TagPage = () => {
 
     return (
         <PageAnimationWrapper>
-            <section className="max-w-[1000px] mx-auto px-4 py-8">
+            <section className="max-w-[990px] mx-auto px-4 sm:px-10 py-8">
                 {/* Tag Header */}
                 <div className="mb-10 text-center border-b border-grey pb-6">
                     <h1 className="text-4xl font-bold mb-4 capitalize">{tag}</h1>
                     <p className="text-dark-grey mb-2">
-                        {`Explore articles tagged with ${tag}`}
+                        {`Explore articles related to `}
+                        <span className="capitalize">{tag}</span>
                     </p>
                     <span className="text-dark-grey">
                         {tagInfo.count} {tagInfo.count === 1 ? 'story' : 'stories'}

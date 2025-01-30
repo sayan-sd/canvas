@@ -399,3 +399,78 @@ exports.getWhomeToFollow = async (req, res) => {
         });
     }
 };
+
+
+// Toggle Bookmarks
+exports.toggleBookmark = async (req, res) => {
+    const { blog_id } = req.body;
+    const user_id = req.user;
+
+    try {
+        // Find the blog to get its _id
+        const blog = await Blog.findOne({ blog_id });
+        if (!blog) {
+            return res.status(404).json({ message: "Blog not found" });
+        }
+
+        // Find user and check if blog is already bookmarked
+        const user = await User.findById(user_id);
+        const isBookmarked = user.bookmarks.includes(blog._id);
+
+        // Update user's bookmarks
+        if (isBookmarked) {
+            await User.findByIdAndUpdate(user_id, {
+                $pull: { bookmarks: blog._id }
+            });
+        } else {
+            await User.findByIdAndUpdate(user_id, {
+                $addToSet: { bookmarks: blog._id }
+            });
+        }
+
+        return res.status(200).json({
+            message: isBookmarked ? "Remove from your reading list" : "Added to your reading list",
+            isBookmarked: !isBookmarked
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Server Error: " + error.message
+        });
+    }
+};
+
+
+// All bookmarked blogs
+exports.getBookmarkedBlogs = async (req, res) => {
+    const user_id = req.user;
+    
+    try {
+        const user = await User.findById(user_id)
+            .populate({
+                path: 'bookmarks',
+                match: { draft: false },
+                options: {
+                    sort: { publishedAt: -1 }
+                },
+                select: '-content -_id',
+                populate: {
+                    path: 'author', 
+                    select: 'personal_info.profile_img personal_info.username personal_info.fullname -_id' 
+                }
+            })
+            .select('bookmarks -_id');
+
+        const totalDocs = await User.findById(user_id)
+            .then(user => user.bookmarks.length);
+
+        return res.status(200).json({
+            blogs: user.bookmarks,
+            totalDocs
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Server Error: " + error.message
+        });
+    }
+};

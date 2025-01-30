@@ -37,9 +37,38 @@ const UserAuthForm = ({ type }) => {
         }
     };
 
+    // fetch bookmark
+    const fetchBookmarks = async (parsedUser) => {
+        if (parsedUser.access_token.length > 0) {
+            axios
+                .post(
+                    `${import.meta.env.VITE_SERVER_DOMAIN}/users/bookmarks`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${parsedUser.access_token}`,
+                        },
+                    }
+                )
+                .then(({ data }) => {
+                    // Store only blog_ids
+                    const bookmarkIds = data.blogs.map((blog) => blog.blog_id);
+                    const updatedUser = {
+                        ...parsedUser,
+                        bookmarkIds: bookmarkIds,
+                    };
+                    setUserAuth(updatedUser);
+                    sessionStorage.setItem("user", JSON.stringify(updatedUser));
+                })
+                .catch((err) =>
+                    console.error("Error fetching bookmarks:", err)
+                );
+        }
+    };
+
     const handleOtpComplete = async (otp) => {
         try {
-            // if verify OTP 
+            // if verify OTP
             await axios.post(
                 import.meta.env.VITE_SERVER_DOMAIN + "/verify-otp",
                 {
@@ -56,7 +85,6 @@ const UserAuthForm = ({ type }) => {
 
             storeInSession("user", JSON.stringify(data.data));
             setUserAuth(data.data);
-            toast.success("Signed up successfully!");
         } catch (error) {
             console.error("Error during verification:", error.response?.data);
             toast.error(error.response?.data?.message || "Verification failed");
@@ -114,6 +142,8 @@ const UserAuthForm = ({ type }) => {
                     );
                     storeInSession("user", JSON.stringify(data.data));
                     setUserAuth(data.data);
+                    fetchBookmarks(data.data);
+                    toast.success("Logged in successfully")
                 } catch (error) {
                     toast.error(
                         error.response?.data?.message || "Sign in failed"
@@ -154,6 +184,7 @@ const UserAuthForm = ({ type }) => {
             // console.log(data)
             storeInSession("user", JSON.stringify(data.data));
             setUserAuth(data.data);
+            fetchBookmarks(data.data);
         } catch (error) {
             const errorMessage =
                 error.response?.data?.message ||
@@ -166,7 +197,7 @@ const UserAuthForm = ({ type }) => {
         e.preventDefault();
         e.stopPropagation();
 
-        // take email 
+        // take email
         const form = e.target.closest("form");
         const emailInput = form?.elements["email"]; // Find the input with name="email"
 

@@ -340,7 +340,7 @@ const HomePage = () => {
                             <p className="text-lg leading-6">
                                 Click the{" "}
                                 <span className="font-bold">
-                                    <i className="fi fi-rr-bookmark"></i>
+                                    <i className="fi fi-rr-bookmark mx-1"></i>
                                 </span>{" "}
                                 on any story to easily add it to your
                                 reading list or a custom list  for better organization.

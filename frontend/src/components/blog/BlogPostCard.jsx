@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getDay } from "../../utils/DateFormatter";
 import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../../App";
+import { handleBookmark } from "./helper/handleBookmark";
 
 const BlogPostCard = ({ content, author }) => {
     const {
@@ -14,7 +16,24 @@ const BlogPostCard = ({ content, author }) => {
     } = content;
     const { fullname, username, profile_img } = author;
     const navigate = useNavigate();
-    const isTagPage = location.pathname.startsWith('/tag/');
+    const isTagPage = location.pathname.startsWith("/tag/");
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [accessToken, setAccessToken] = useState(null);
+
+    const { userAuth, setUserAuth } = useContext(UserContext);
+    let access_token;
+
+    useEffect(() => {
+        if (userAuth?.bookmarkIds) {
+            setIsBookmarked(userAuth.bookmarkIds.includes(id));
+        }
+    }, [userAuth?.bookmarkIds, id]);
+
+    useEffect(() => {
+        if (userAuth != null) {
+            setAccessToken(userAuth.access_token);
+        }
+    }, [userAuth]);
 
     return (
         <Link
@@ -62,7 +81,11 @@ const BlogPostCard = ({ content, author }) => {
                 <h1 className="blog-title">{title}</h1>
 
                 {/* blog description */}
-                <p className={`my-3 text-xl font-gelasio max-sm:hidden left-7 line-clamp-2 ${isTagPage ? "" : "md:max-[1100px]:hidden"}`}>
+                <p
+                    className={`my-3 text-xl font-gelasio max-sm:hidden left-7 line-clamp-2 ${
+                        isTagPage ? "" : "md:max-[1100px]:hidden"
+                    }`}
+                >
                     {des}
                 </p>
 
@@ -79,7 +102,25 @@ const BlogPostCard = ({ content, author }) => {
                         </span>
                     </div>
 
-                    <i className="fi fi-rr-bookmark md:mr-8 text-xl"></i>
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleBookmark(
+                                accessToken,
+                                id,
+                                isBookmarked,
+                                setIsBookmarked,
+                                userAuth,
+                                setUserAuth
+                            );
+                        }}
+                    >
+                        <i
+                            className={`fi fi-${
+                                isBookmarked ? "sr" : "rr"
+                            }-bookmark md:mr-8 text-xl`}
+                        ></i>
+                    </button>
                 </div>
             </div>
 

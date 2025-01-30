@@ -4,6 +4,7 @@ import { UserContext } from "../../App";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { handleBookmark } from "./helper/handleBookmark";
 
 const BlogInteraction = () => {
     let {
@@ -26,6 +27,7 @@ const BlogInteraction = () => {
     const shareButtonRef = useRef(null);
     const sharePopupRef = useRef(null);
     const [popupPosition, setPopupPosition] = useState("bottom");
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     if (blog != null) {
         blog_id = blog.blog_id;
@@ -38,12 +40,17 @@ const BlogInteraction = () => {
     }
 
     // user context
-    const { userAuth } = useContext(UserContext);
+    const { userAuth, setUserAuth } = useContext(UserContext);
     let username, access_token;
     if (userAuth != null) {
         access_token = userAuth.access_token;
         username = userAuth.username;
     }
+    useEffect(() => {
+        if (userAuth?.bookmarkIds) {
+            setIsBookmarked(userAuth.bookmarkIds.includes(blog_id));
+        }
+    }, [userAuth?.bookmarkIds, blog_id]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -67,16 +74,18 @@ const BlogInteraction = () => {
     useEffect(() => {
         const determinePopupPosition = () => {
             if (!shareButtonRef.current || !sharePopupRef.current) return;
-    
+
             const buttonRect = shareButtonRef.current.getBoundingClientRect();
             const popupRect = sharePopupRef.current.getBoundingClientRect();
             const windowHeight = window.innerHeight;
-    
+
             setPopupPosition(
-                windowHeight - buttonRect.bottom >= popupRect.height ? 'bottom' : 'top'
+                windowHeight - buttonRect.bottom >= popupRect.height
+                    ? "bottom"
+                    : "top"
             );
         };
-    
+
         if (showSharePopup) {
             // Use microtask to ensure DOM is updated before calculation
             Promise.resolve().then(determinePopupPosition);
@@ -166,6 +175,40 @@ const BlogInteraction = () => {
         setShowSharePopup(false);
     };
 
+    // const handleBookmark = async () => {
+    //     if (!access_token) {
+    //         toast.error("Please login first");
+    //         return;
+    //     }
+
+    //     try {
+    //         const response = await axios.post(
+    //             `${import.meta.env.VITE_SERVER_DOMAIN}/users/toggle-bookmark`,
+    //             { blog_id },
+    //             { headers: { Authorization: `Bearer ${access_token}` } }
+    //         );
+
+    //         // Update bookmarkIds in userAuth
+    //         const updatedBookmarkIds = isBookmarked
+    //             ? userAuth.bookmarkIds.filter(id => id !== blog_id)
+    //             : [...(userAuth.bookmarkIds || []), blog_id];
+
+    //         const updatedUser = { 
+    //             ...userAuth, 
+    //             bookmarkIds: updatedBookmarkIds
+    //         };
+    //         setUserAuth(updatedUser);
+    //         sessionStorage.setItem("user", JSON.stringify(updatedUser));
+
+    //         setIsBookmarked(!isBookmarked);
+    //         toast.success(response.data.message);
+    //     } catch (error) {
+    //         console.error('Bookmark error:', error);
+    //         toast.error(error.response?.data?.message || "Failed to update bookmark");
+    //     }
+    // };
+
+
     return (
         <>
             <hr className="border-grey my-2" />
@@ -212,48 +255,67 @@ const BlogInteraction = () => {
                         ""
                     )}
 
-                    {/* share button */}
-                    <div className="relative">
+                    {/* share & bookmark button */}
+                    <div className="flex items-center gap-6">
+                        {/* bookmark */}
                         <button
-                            ref={shareButtonRef}
-                            className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80"
-                            onClick={handleShareClick}
+                            onClick={() => handleBookmark(access_token, blog_id, isBookmarked, setIsBookmarked, userAuth, setUserAuth)}
+                            className="w-10 h-10 rounded-full flex items-center justify-center"
                         >
-                            <i className="fi fi-rr-share text-xl flex items-center justify-center"></i>
+                            <i
+                                className={`fi ${
+                                    isBookmarked
+                                        ? "fi-sr-bookmark"
+                                        : "fi-rr-bookmark"
+                                } text-2xl flex items-center justify-center`}
+                            ></i>
                         </button>
 
-                        {showSharePopup && (
-                            <div
-                                ref={sharePopupRef}
-                                className={
-                                    `absolute right-0 w-52 bg-white border-2 border-grey rounded-lg shadow-lg z-10 ${popupPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'}`
-                                }
+                        {/* share */}
+                        <div className="relative">
+                            <button
+                                ref={shareButtonRef}
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80"
+                                onClick={handleShareClick}
                             >
-                                <ul>
-                                    <li
-                                        className="px-4 py-2 hover:bg-grey cursor-pointer border-b border-grey flex items-center gap-3"
-                                        onClick={copyLinkToClipboard}
-                                    >
-                                        <i className="fi fi-rr-link-alt"></i>
-                                        Copy Link
-                                    </li>
-                                    <li
-                                        className="px-4 py-2 hover:bg-grey cursor-pointer flex items-center gap-3"
-                                        onClick={shareOnX}
-                                    >
-                                        <i className="fi fi-brands-twitter-alt-square mt-1"></i>
-                                        Share on X
-                                    </li>
-                                    <li
-                                        className="px-4 py-2 hover:bg-grey cursor-pointer flex items-center gap-3"
-                                        onClick={shareOnLinkedIn}
-                                    >
-                                        <i className="fi fi-brands-linkedin mt-1"></i>
-                                        Share on LinkedIn
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
+                                <i className="fi fi-rr-share text-xl flex items-center justify-center"></i>
+                            </button>
+
+                            {showSharePopup && (
+                                <div
+                                    ref={sharePopupRef}
+                                    className={`absolute right-0 w-52 bg-white border-2 border-grey rounded-lg shadow-lg z-10 ${
+                                        popupPosition === "bottom"
+                                            ? "top-full mt-2"
+                                            : "bottom-full mb-2"
+                                    }`}
+                                >
+                                    <ul>
+                                        <li
+                                            className="px-4 py-2 hover:bg-grey cursor-pointer border-b border-grey flex items-center gap-3"
+                                            onClick={copyLinkToClipboard}
+                                        >
+                                            <i className="fi fi-rr-link-alt"></i>
+                                            Copy Link
+                                        </li>
+                                        <li
+                                            className="px-4 py-2 hover:bg-grey cursor-pointer flex items-center gap-3"
+                                            onClick={shareOnX}
+                                        >
+                                            <i className="fi fi-brands-twitter-alt-square mt-1"></i>
+                                            Share on X
+                                        </li>
+                                        <li
+                                            className="px-4 py-2 hover:bg-grey cursor-pointer flex items-center gap-3"
+                                            onClick={shareOnLinkedIn}
+                                        >
+                                            <i className="fi fi-brands-linkedin mt-1"></i>
+                                            Share on LinkedIn
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
