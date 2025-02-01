@@ -1,10 +1,13 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
-import { UserContext } from "../../App";
+import { ThemeContext, UserContext } from "../../App";
 import Loader from "../common/Loader";
 
 const SideNav = () => {
     const [isLoading, setIsLoading] = useState(true);
+
+    const { theme } = useContext(ThemeContext);
+
     let { userAuth } = useContext(UserContext);
     let access_token, new_notification_available;
     if (userAuth != null) {
@@ -80,116 +83,242 @@ const SideNav = () => {
     }
 
     return !isLoading && access_token == undefined ? (
-        <Navigate to={"/signin"} />
+        <Navigate to="/signin" />
     ) : (
         <>
-            <section className=" relative flex gap-10 py-0 m-0 max-md:flex-col">
-                <div className=" sticky top-[80px] z-30">
-                    {/* settings menu for sm devices */}
-                    <div className="md:hidden bg-white py-1 border-b border-grey flex flex-nowrap overflow-x-auto">
-                        <button
-                            ref={sideBarIconTab}
-                            className="p-5 capitalize"
-                            onClick={changePageState}
-                        >
-                            <i className="fi fi-rr-bars-staggered pointer-events-none"></i>
-                        </button>
-
-                        <button
-                            ref={pageStateTab}
-                            className="p-5 capitalize"
-                            onClick={changePageState}
-                        >
-                            {pageState}
-                        </button>
-                        <hr
-                            ref={activeTabLine}
-                            className="absolute bottom-0 duration-500"
-                        />
-                    </div>
-
-                    {/* side nav */}
-                    <div
-                        className={
-                            "min-w-[200px] h-[calc(100vh-80px-64px)] md:h-cover md:sticky top-24 overflow-y-auto p-6 md:pr-0 md:border-grey md:border-r absolute max-md:top-[64px] bg-white max-md:w-[calc(100%+80px)] max-md:px-16 max-md:-ml-7 duration-500 " +
-                            (!showSideNav
-                                ? "max-md:opacity-0 max-md:pointer-events-none"
-                                : "opacity-100 pointer-events-auto")
-                        }
-                    >
+            <section className="relative flex gap-10 py-0 m-0 max-md:flex-col">
+                {/* Desktop Sidebar */}
+                <div className="hidden md:block">
+                    <div className="sticky top-[70px] z-40 bg-white border-grey border-r p-6 shadow-sm min-w-[200px] md:w-[240px] h-[calc(100vh-70px-64px)]">
                         <h1 className="text-xl text-dark-grey mb-3">
                             Dashboard
                         </h1>
                         <hr className="border-grey -ml-6 mb-8 mr-6" />
+                        <nav className="space-y-4">
+                            <NavLink
+                                to="/dashboard/blogs"
+                                onClick={(e) =>
+                                    setPageState(e.target.innerText)
+                                }
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                            >
+                                <i className="fi fi-rr-document mr-3"></i>
+                                Blogs
+                            </NavLink>
 
-                        <NavLink
-                            to={"/dashboard/blogs"}
-                            onClick={(e) => setPageState(e.target.innerText)}
-                            className={"sidebar-link"}
-                        >
-                            <i className="fi fi-rr-document"></i>
-                            Blogs
-                        </NavLink>
-
-                        <NavLink
-                            to={"/dashboard/notifications"}
-                            onClick={(e) => setPageState(e.target.innerText)}
-                            className={"sidebar-link"}
-                        >
-                            <div className="relative">
-                                <i className="fi fi-rr-bell"></i>
-                                {new_notification_available ? (
-                                    <span className="bg-red w-2 h-2 rounded-full absolute z-10 top-0 right-0"></span>
-                                ) : (
-                                    ""
+                            <NavLink
+                                to="/dashboard/notifications"
+                                onClick={(e) =>
+                                    setPageState(e.target.innerText)
+                                }
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200 relative"
+                            >
+                                <i className="fi fi-rr-bell mr-3"></i>
+                                Notifications
+                                {new_notification_available && (
+                                    <span className="bg-red w-2 h-2 rounded-full absolute top-3 right-3"></span>
                                 )}
-                            </div>
-                            Notifications
-                        </NavLink>
+                            </NavLink>
 
-                        <NavLink
-                            to={"/dashboard/bookmarks"}
-                            onClick={(e) => setPageState(e.target.innerText)}
-                            className={"sidebar-link"}
-                        >
-                            <i className="fi fi-rr-book-bookmark"></i>
-                            Bookmarks
-                        </NavLink>
+                            <NavLink
+                                to="/dashboard/bookmarks"
+                                onClick={(e) =>
+                                    setPageState(e.target.innerText)
+                                }
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                            >
+                                <i className="fi fi-rr-book-bookmark mr-3"></i>
+                                Bookmarks
+                            </NavLink>
 
-                        <NavLink
-                            to={"/editor"}
-                            onClick={(e) => setPageState(e.target.innerText)}
-                            className={"sidebar-link"}
-                        >
-                            <i className="fi fi-rr-file-edit"></i>
-                            Write
-                        </NavLink>
+                            <NavLink
+                                to="/editor"
+                                onClick={(e) =>
+                                    setPageState(e.target.innerText)
+                                }
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                            >
+                                <i className="fi fi-rr-file-edit mr-3"></i>
+                                Write
+                            </NavLink>
+                        </nav>
+                        <div className="mt-10">
+                            <h1 className="text-xl text-dark-grey mb-3">
+                                Settings
+                            </h1>
+                            <hr className="border-grey -ml-6 mb-8 mr-6" />
+                            <nav className="space-y-4">
+                                <NavLink
+                                    to="/settings/edit-profile"
+                                    onClick={(e) =>
+                                        setPageState(e.target.innerText)
+                                    }
+                                    className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                >
+                                    <i className="fi fi-rr-user mr-3"></i>
+                                    Edit Profile
+                                </NavLink>
 
-                        <h1 className="text-xl text-dark-grey mt-20 mb-3">
-                            Settings
-                        </h1>
-                        <hr className="border-grey -ml-6 mb-8 mr-6" />
-
-                        <NavLink
-                            to={"/settings/edit-profile"}
-                            onClick={(e) => setPageState(e.target.innerText)}
-                            className={"sidebar-link"}
-                        >
-                            <i className="fi fi-rr-user"></i>
-                            Edit Profile
-                        </NavLink>
-
-                        <NavLink
-                            to={"/settings/change-password"}
-                            onClick={(e) => setPageState(e.target.innerText)}
-                            className={"sidebar-link"}
-                        >
-                            <i className="fi fi-rr-lock"></i>
-                            Change Password
-                        </NavLink>
+                                <NavLink
+                                    to="/settings/change-password"
+                                    onClick={(e) =>
+                                        setPageState(e.target.innerText)
+                                    }
+                                    className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                >
+                                    <i className="fi fi-rr-lock mr-3"></i>
+                                    Change Password
+                                </NavLink>
+                            </nav>
+                        </div>
                     </div>
                 </div>
 
+                {/* Mobile Navbar */}
+                <div className="md:hidden relative">
+                    {/* Top Navbar */}
+                    <div
+                        className={`bg-white border-b border-grey sticky top-0 z-40 flex items-center justify-between p-4 duration-300`}
+                    >
+                        <button
+                            ref={sideBarIconTab}
+                            onClick={() => setShowSideNav(true)}
+                            className="p-2 focus:outline-none"
+                        >
+                            <i className="fi fi-rr-bars-staggered text-xl"></i>
+                        </button>
+                        <button
+                            ref={pageStateTab}
+                            onClick={changePageState}
+                            className="p-2 capitalize focus:outline-none"
+                        >
+                            {pageState}
+                        </button>
+                        <div className="w-6" /> {/* Spacer */}
+                    </div>
+
+                    {/* Slide-in Sidebar from the Left */}
+                    <div
+                        className={`fixed top-[64px] left-0 bottom-0 w-[80%] max-w-sm bg-white border-r border-grey shadow-md transform transition-transform duration-300 z-50 ${
+                            showSideNav ? "translate-x-0" : "-translate-x-full"
+                        }`}
+                    >
+                        <div className="p-6 overflow-y-auto h-full">
+                            {/* Dashboard Header with Close (X) Button */}
+                            <div className="flex items-center justify-between mb-3">
+                                <h1 className="text-xl text-dark-grey">
+                                    Dashboard
+                                </h1>
+                                <button
+                                    onClick={() => setShowSideNav(false)}
+                                    className="p-2 focus:outline-none"
+                                >
+                                    <i className="fi fi-rr-cross text-xl"></i>
+                                </button>
+                            </div>
+                            <hr className="border-grey -ml-6 mb-8 mr-6" />
+
+                            {/* Navigation Links */}
+                            <nav className="space-y-4">
+                                <NavLink
+                                    to="/dashboard/blogs"
+                                    onClick={(e) => {
+                                        setPageState(e.target.innerText);
+                                        setShowSideNav(false);
+                                    }}
+                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                >
+                                    <i className="fi fi-rr-document mr-3"></i>
+                                    Blogs
+                                </NavLink>
+
+                                <NavLink
+                                    to="/dashboard/notifications"
+                                    onClick={(e) => {
+                                        setPageState(e.target.innerText);
+                                        setShowSideNav(false);
+                                    }}
+                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200 relative"
+                                >
+                                    <i className="fi fi-rr-bell mr-3"></i>
+                                    Notifications
+                                    {new_notification_available && (
+                                        <span className="bg-red w-2 h-2 rounded-full absolute top-3 right-3"></span>
+                                    )}
+                                </NavLink>
+
+                                <NavLink
+                                    to="/dashboard/bookmarks"
+                                    onClick={(e) => {
+                                        setPageState(e.target.innerText);
+                                        setShowSideNav(false);
+                                    }}
+                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                >
+                                    <i className="fi fi-rr-book-bookmark mr-3"></i>
+                                    Bookmarks
+                                </NavLink>
+
+                                <NavLink
+                                    to="/editor"
+                                    onClick={(e) => {
+                                        setPageState(e.target.innerText);
+                                        setShowSideNav(false);
+                                    }}
+                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                >
+                                    <i className="fi fi-rr-file-edit mr-3"></i>
+                                    Write
+                                </NavLink>
+                            </nav>
+
+                            {/* Settings Section */}
+                            <div className="mt-10">
+                                <h1 className="text-xl text-dark-grey mb-3">
+                                    Settings
+                                </h1>
+                                <hr className="border-grey -ml-6 mb-8 mr-6" />
+                                <nav className="space-y-4">
+                                    <NavLink
+                                        to="/settings/edit-profile"
+                                        onClick={(e) => {
+                                            setPageState(e.target.innerText);
+                                            setShowSideNav(false);
+                                        }}
+                                        className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    >
+                                        <i className="fi fi-rr-user mr-3"></i>
+                                        Edit Profile
+                                    </NavLink>
+
+                                    <NavLink
+                                        to="/settings/change-password"
+                                        onClick={(e) => {
+                                            setPageState(e.target.innerText);
+                                            setShowSideNav(false);
+                                        }}
+                                        className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    >
+                                        <i className="fi fi-rr-lock mr-3"></i>
+                                        Change Password
+                                    </NavLink>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Background Overlay (click to dismiss the sidebar) */}
+                    {showSideNav && (
+                        <div
+                            onClick={() => setShowSideNav(false)}
+                            className={`fixed inset-0 ${
+                                theme == "light" ? "bg-[#000] opacity-20" : "bg-[#333] opacity-30"
+                            } z-40`}
+                        ></div>
+                    )}
+                </div>
+
+                {/* Main Content */}
                 <div className="max-md:-mt-8 mt-5 w-full">
                     <Outlet />
                 </div>

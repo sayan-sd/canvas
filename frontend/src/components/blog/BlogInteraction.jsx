@@ -284,7 +284,7 @@ const BlogInteraction = () => {
                             {showSharePopup && (
                                 <div
                                     ref={sharePopupRef}
-                                    className={`absolute right-0 w-52 bg-white border-2 border-grey rounded-lg shadow-lg z-10 ${
+                                    className={`absolute right-0 w-52 bg-white border-2 border-grey rounded-lg shadow-2xl z-10 ${
                                         popupPosition === "bottom"
                                             ? "top-full mt-2"
                                             : "bottom-full mb-2"

@@ -32,6 +32,7 @@ export default {
                 'transparent': "transparent",
                 'twitter': "#1DA1F2",
                 'purple': "#8B46FF",
+                'yellow': "#fcd117",
             },
             dark: {
                 'white': "#242424",
@@ -42,6 +43,7 @@ export default {
                 'transparent': "transparent",
                 'twitter': "#0E71A8",
                 'purple': "#d52ab8",
+                'yellow': "#fcd117",
             },
         })
     ],

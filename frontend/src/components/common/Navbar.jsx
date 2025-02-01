@@ -66,6 +66,7 @@ const Navbar = () => {
 
         if (e.key == "Enter" && query.length) {
             navigate(`/search/${query}`);
+            setSearchBoxVisibility(!searchBoxVisibility);
         }
     };
 
@@ -79,7 +80,7 @@ const Navbar = () => {
 
     return (
         <div>
-            <nav className="navbar z-50">
+            <nav className="navbar z-[100]">
                 {/* Logo */}
                 <Link
                     to={"/"}
@@ -122,10 +123,10 @@ const Navbar = () => {
 
                     <Link
                         to={"/editor"}
-                        className="hidden md:flex gap-2 link hover:rounded-md"
+                        className="hidden md:flex gap-2 link"
                     >
-                        <p>Write</p>
                         <i className="fi fi-rr-file-edit"></i>
+                        <p>Write</p>
                     </Link>
 
                     <button

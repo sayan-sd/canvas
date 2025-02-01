@@ -35,7 +35,7 @@ const TagPage = () => {
             )
 
             let formatedData = await filterPaginationData({
-                state: blogs,
+                state: page == 1 ? null : blogs,
                 data: data.blogs,
                 page,
                 countRoute: `/blogs/search-blogs-count`,

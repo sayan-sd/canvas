@@ -100,7 +100,7 @@ const HomePage = () => {
         if (
             !loading &&
             blogs?.totalDocs > blogs?.results.length &&
-            scrollTop + clientHeight >= scrollHeight - 200
+            scrollTop + clientHeight >= scrollHeight - 100
             // scrollTop + clientHeight >= scrollHeight - 500
         ) {
             const nextPage = blogs.page + 1;
@@ -151,12 +151,35 @@ const HomePage = () => {
 
     return (
         <PageAnimationWrapper>
-            <section className="h-cover flex justify-center gap-10">
+            <section className="h-cover flex flex-col md:flex-row justify-center gap-5 md:gap-10 pt-5">
+                {/* categories for small devices */}
+                {/* categories (tags) */}
+                <div className="w-full overflow-x-auto no-scrollbar md:hidden">
+                    <div className="flex gap-3 whitespace-nowrap">
+                        {categories.map((category, i) => {
+                            return (
+                                <button
+                                    className={`tag ${
+                                        pageState == category
+                                            ? "bg-black text-white"
+                                            : ""
+                                    }`}
+                                    key={i}
+                                    onClick={loadBlogByCategory}
+                                >
+                                    {category}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
                 {/* Latest / category blogs */}
                 <div className="w-full">
                     <InpageNavigation
                         routes={[pageState, "trending blogs"]}
                         defaultHidden={["trending blogs"]}
+                        icons={["fi-rr-home", "fi-rr-arrow-trend-up"]}
                     >
                         <>
                             {blogs == null ? (
@@ -237,7 +260,7 @@ const HomePage = () => {
                 </div>
 
                 {/* filter and trending blogs(lg) */}
-                <div className="min-w-[40%] lg:min-w-[400px] max-w-min border-l border-grey pl-10 pt-3 max-md:hidden">
+                <div className="min-w-[30%] lg:min-w-[360px] max-w-min border-l border-grey pl-10 pt-3 max-md:hidden">
                     <div className="flex flex-col gap-10">
                         {/* trending sec: lg */}
                         <div>
@@ -301,7 +324,7 @@ const HomePage = () => {
                         </div>
 
                         {/* whome to follow */}
-                        <div className="mt-8 hidden md:inline-block">
+                        <div className="mt-8">
                             <h1 className="font-medium text-xl mb-8">
                                 Top Storyteller for you
                             </h1>
@@ -332,9 +355,9 @@ const HomePage = () => {
                         </div>
 
                         {/* reading list */}
-                        <div className="hidden lg:inline-block mt-2">
+                        <div className="mt-2">
                             <h1 className="font-medium text-xl mb-4">
-                                Top Storyteller for you
+                                Reading List
                             </h1>
 
                             <p className="text-lg leading-6">
@@ -342,8 +365,8 @@ const HomePage = () => {
                                 <span className="font-bold">
                                     <i className="fi fi-rr-bookmark mx-1"></i>
                                 </span>{" "}
-                                on any story to easily add it to your
-                                reading list or a custom list  for better organization.
+                                on any story to easily add it to your reading
+                                list or a custom list for better organization.
                             </p>
                         </div>
                     </div>

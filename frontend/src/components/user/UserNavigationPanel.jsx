@@ -18,7 +18,7 @@ const UserNavigationPanel = () => {
     };
 
     return (
-        <PageAnimationWrapper transition={{ duration: 0.2 }} className={"absolute right-0 z-50"}>
+        <PageAnimationWrapper transition={{ duration: 0.2 }} className={"absolute right-0 z-[70]"}>
             <div className="bg-white absolute right-0 border border-grey w-60 duration-200">
                 {/* write tab (for small devices) */}
                 <Link
