@@ -206,7 +206,7 @@ const EditProfile = () => {
                                 className=" relative block w-48 h-48 bg-grey rounded-full overflow-hidden"
                             >
                                 <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white bg-black/40  cursor-pointer">
-                                    Upload Image
+                                    Click to Upload
                                 </div>
                                 <img
                                     src={profile_img}

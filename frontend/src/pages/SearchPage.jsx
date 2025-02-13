@@ -111,7 +111,7 @@ const SearchPage = () => {
                     {/* Blogs Search Data */}
                     <>
                         {blogs == null ? (
-                            [...Array(3)].map((_, i) => (
+                            [...Array(2)].map((_, i) => (
                                 <BlogPostCardSkeleton key={i} />
                             ))
                         ) : blogs.results.length ? (

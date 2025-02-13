@@ -59,6 +59,10 @@ const PublishBlogForm = () => {
             let tag = e.target.value;
             tag = tag.trim();
 
+            if (!/^[a-zA-Z\s]*$/.test(tag)) {
+                return toast.error("Only letters and spaces are allowed in tags");
+            }
+
             if (tags.length < tagLimit) {
                 if (!tags.includes(tag) && tag.length) {
                     setBlog({ ...blog, tags: [...tags, tag] });

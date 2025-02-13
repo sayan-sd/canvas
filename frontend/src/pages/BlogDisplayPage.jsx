@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import PageAnimationWrapper from "../components/common/PageAnimation";
 import { getDay } from "../utils/DateFormatter";
@@ -32,11 +32,14 @@ const BlogDisplayPage = () => {
     const [commentsWrapper, setCommentsWrapper] = useState(false);
     const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] =
         useState(0);
+    const navigate = useNavigate();
 
     let {
         title,
         content,
         banner,
+        des,
+        tags,
         author: {
             personal_info: { fullname, username: author_username, profile_img },
         },
@@ -110,21 +113,32 @@ const BlogDisplayPage = () => {
                         setTotalParentCommentsLoaded,
                     }}
                 >
-                    {/* comment Card */}
+                    {/* Comments Section */}
                     <CommentsContainer />
 
-                    <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
-                        <img
-                            src={banner}
-                            alt="Blog Banner"
-                            className="aspect-video rounded-md"
-                        />
+                    <div className="min-h-screen">
+                        <div className="max-w-5xl mx-auto py-12 px-6">
+                            {/* Title & Description */}
+                            <div className="mb-8 text-center">
+                                <h1 className="text-4xl font-bold mb-4">
+                                    {title}
+                                </h1>
+                                <p className="text-lg md:max-w-[75%] center text-dark-grey line-clamp-3">
+                                    {des}
+                                </p>
+                            </div>
 
-                        {/* user details */}
-                        <div className="mt-12">
-                            <h2>{title}</h2>
+                            {/* Banner Image */}
+                            <div className="rounded-lg overflow-hidden shadow-lg mb-8">
+                                <img
+                                    src={banner}
+                                    alt="Blog Banner"
+                                    className="w-full object-cover aspect-video"
+                                    style={{ maxHeight: "400px" }}
+                                />
+                            </div>
 
-                            {/* author */}
+                            {/* Author & Publication Details */}
                             <div className="flex max-sm:flex-col justify-between my-8">
                                 <div className="flex gap-5 items-start">
                                     <img
@@ -151,55 +165,73 @@ const BlogDisplayPage = () => {
                                     Published on {getDay(publishedAt)}
                                 </p>
                             </div>
-                        </div>
 
-                        {/* blog activity */}
-                        <BlogInteraction />
+                            {/* Blog Interaction (Top) */}
+                            <BlogInteraction />
 
-                        {/* Blog Content */}
-                        <div className="my-12 font-gelasio blog-page-content">
-                            {content[0].blocks.map((block, i) => {
-                                return (
-                                    <div key={i} className="my-4 md:my-8">
+                            {/* Blog Content */}
+                            <div className="mt-8 blog-page-content max-w-none">
+                                {content[0].blocks.map((block, i) => (
+                                    <div key={i} className="my-4">
                                         <BlogContent block={block} />
                                     </div>
-                                );
-                            })}
-                        </div>
+                                ))}
+                            </div>
 
-                        {/* blog activiy */}
-                        <BlogInteraction />
+                            {/* Blog Interaction (Bottom) */}
+                            <BlogInteraction />
 
-                        {/* similar blogs */}
-                        {similarBlogs != null && similarBlogs.length ? (
-                            <>
-                                <h1 className="text-2xl mt-14 mb-10 font-medium">
-                                    Similar Blogs
-                                </h1>
-                                {similarBlogs.map((blog, i) => {
-                                    let {
-                                        author: { personal_info },
-                                    } = blog;
-
-                                    return (
-                                        <PageAnimationWrapper
-                                            key={i}
-                                            transition={{
-                                                duration: 1,
-                                                delay: i * 0.08,
-                                            }}
+                            {/* Tags Section */}
+                            {tags && tags.length ? (
+                                <div className="mt-8 flex flex-wrap gap-2">
+                                    {tags.map((tag, idx) => (
+                                        <button
+                                            key={idx}
+                                            className="bg-grey px-3 py-1 hover:underline rounded-full text-sm"
+                                            onClick={() =>
+                                                navigate(
+                                                    `/tag/${tag.replace(
+                                                        " ",
+                                                        "-"
+                                                    )}`
+                                                )
+                                            }
                                         >
-                                            <BlogPostCard
-                                                content={blog}
-                                                author={personal_info}
-                                            />
-                                        </PageAnimationWrapper>
-                                    );
-                                })}
-                            </>
-                        ) : (
-                            ""
-                        )}
+                                            {tag}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : null}
+
+                            {/* Similar Blogs Section */}
+                            {similarBlogs != null && similarBlogs.length ? (
+                                <>
+                                    <h1 className="text-2xl mt-14 mb-6 font-medium">
+                                        Similar Blogs
+                                    </h1>
+
+                                    {similarBlogs.map((blog, i) => {
+                                        let {
+                                            author: { personal_info },
+                                        } = blog;
+                                        return (
+                                            <PageAnimationWrapper
+                                                key={i}
+                                                transition={{
+                                                    duration: 1,
+                                                    delay: i * 0.08,
+                                                }}
+                                            >
+                                                <BlogPostCard
+                                                    content={blog}
+                                                    author={personal_info}
+                                                />
+                                            </PageAnimationWrapper>
+                                        );
+                                    })}
+                                </>
+                            ) : null}
+                        </div>
                     </div>
                 </BlogContext.Provider>
             )}

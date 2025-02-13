@@ -15,11 +15,15 @@ import ChangePassword from "./pages/settings/ChangePassword";
 import EditProfile from "./pages/settings/EditProfile";
 import Notifications from "./pages/settings/Notifications";
 import ManageBlogs from "./pages/settings/ManageBlogs";
+import TagPage from "./pages/TagPage";
+import Bookmark from "./pages/settings/Bookmark";
+import axios from "axios";
 
 export const UserContext = createContext({});
 export const ThemeContext = createContext({});
 
-const darkThemePreference = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
+const darkThemePreference = () =>
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 function App() {
     const [userAuth, setUserAuth] = useState();
@@ -27,11 +31,12 @@ function App() {
     // const [theme, setTheme] = useState(() => darkThemePreference() ? 'dark' : 'light');
 
     useEffect(() => {
-        let userInSesstion = lookInSession("user");
+        let userInSession = lookInSession("user");
         let themeInSesstion = lookInSession("theme");
+        // const [theme, setTheme] = useState(() => darkThemePreference() ? 'dark' : 'light');
 
-        if (userInSesstion !== null) {
-            setUserAuth(JSON.parse(userInSesstion));
+        if (userInSession !== null) {
+            setUserAuth(JSON.parse(userInSession));
         } else {
             setUserAuth({ access_token: null });
         }
@@ -63,6 +68,7 @@ function App() {
                                 path="notifications"
                                 element={<Notifications />}
                             />
+                            <Route path="bookmarks" element={<Bookmark />} />
                         </Route>
                         <Route path="/settings" element={<SideNav />}>
                             <Route
@@ -86,6 +92,7 @@ function App() {
                             path="/reset-password/:token"
                             element={<ResetPassword />}
                         />
+                        <Route path="/tag/:tag" element={<TagPage />} />
                         <Route path="/search/:query" element={<SearchPage />} />
                         <Route path="/user/:id" element={<UserProfilePage />} />
                         <Route

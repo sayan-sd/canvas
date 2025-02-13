@@ -339,7 +339,7 @@ exports.deleteBlog = async (req, res) => {
 
         // First find the blog to make sure it exists and to get its _id
         const blog = await Blog.findOne({ blog_id });
-        
+
         if (!blog) {
             return res.status(404).json({ message: "Blog not found" });
         }
@@ -348,34 +348,129 @@ exports.deleteBlog = async (req, res) => {
         await Promise.all([
             // Delete the blog
             Blog.findOneAndDelete({ blog_id }),
-            
+
             // Delete related notifications
             Notification.deleteMany({ blog: blog._id }),
-            
+
             // Delete related comments
             Comment.deleteMany({ blog_id: blog._id }),
-            
+
             // Update user
             User.findOneAndUpdate(
                 { _id: user_id },
                 {
                     $pull: { blogs: blog._id },
-                    $inc: { "account_info.total_posts": -1 }
+                    $inc: { "account_info.total_posts": -1 },
                 }
-            )
+            ),
         ]);
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
-            message: "Blog deleted successfully" 
+            message: "Blog deleted successfully",
         });
-
     } catch (err) {
         console.error("Delete blog error:", err);
-        return res.status(500).json({ 
+        return res.status(500).json({
             success: false,
             message: "Server error while deleting blog",
-            error: err.message 
+            error: err.message,
+        });
+    }
+};
+
+// Get top 3 user with max read count
+exports.getWhomeToFollow = async (req, res) => {
+    const maxLimit = 3;
+    try {
+        const users = await User.find()
+            .sort({ "account_info.total_reads": -1 })
+            .limit(maxLimit)
+            .select(
+                "personal_info.fullname personal_info.username personal_info.profile_img -_id"
+            );
+        res.json(users);
+    } catch (err) {
+        console.error("Get top 3 users error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching top 3 users",
+            error: err.message,
+        });
+    }
+};
+
+
+// Toggle Bookmarks
+exports.toggleBookmark = async (req, res) => {
+    const { blog_id } = req.body;
+    const user_id = req.user;
+
+    try {
+        // Find the blog to get its _id
+        const blog = await Blog.findOne({ blog_id });
+        if (!blog) {
+            return res.status(404).json({ message: "Blog not found" });
+        }
+
+        // Find user and check if blog is already bookmarked
+        const user = await User.findById(user_id);
+        const isBookmarked = user.bookmarks.includes(blog._id);
+
+        // Update user's bookmarks
+        if (isBookmarked) {
+            await User.findByIdAndUpdate(user_id, {
+                $pull: { bookmarks: blog._id }
+            });
+        } else {
+            await User.findByIdAndUpdate(user_id, {
+                $addToSet: { bookmarks: blog._id }
+            });
+        }
+
+        return res.status(200).json({
+            message: isBookmarked ? "Remove from your reading list" : "Added to your reading list",
+            isBookmarked: !isBookmarked
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Server Error: " + error.message
+        });
+    }
+};
+
+
+// All bookmarked blogs
+exports.getBookmarkedBlogs = async (req, res) => {
+    const user_id = req.user;
+    
+    try {
+        const user = await User.findById(user_id)
+            .populate({
+                path: 'bookmarks',
+                match: { draft: false },
+                options: {
+                    sort: { publishedAt: -1 }
+                },
+                select: '-content -_id',
+                populate: {
+                    path: 'author', 
+                    select: 'personal_info.profile_img personal_info.username personal_info.fullname -_id' 
+                }
+            })
+            .select('bookmarks -_id');
+
+        const totalDocs = await User.findById(user_id)
+            .then(user => user.bookmarks.length);
+
+        return res.status(200).json({
+            blogs: user.bookmarks,
+            totalDocs
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Server Error: " + error.message
         });
     }
 };

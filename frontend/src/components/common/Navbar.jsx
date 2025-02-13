@@ -66,6 +66,7 @@ const Navbar = () => {
 
         if (e.key == "Enter" && query.length) {
             navigate(`/search/${query}`);
+            setSearchBoxVisibility(!searchBoxVisibility);
         }
     };
 
@@ -79,21 +80,11 @@ const Navbar = () => {
 
     return (
         <div>
-            <nav className="navbar z-50">
+            <nav className="navbar z-[100]">
                 {/* Logo */}
                 <Link
                     to={"/"}
                     className="flex-none w-10"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        
-                        navigate('/');
-        
-                        // Reset category if on home page
-                        if (window.homePageRef && window.homePageRef.resetCategory) {
-                            window.homePageRef.resetCategory();
-                        }
-                    }}
                 >
                     <img
                         src={theme == "light" ? lightLogo : darkLogo}
@@ -132,10 +123,10 @@ const Navbar = () => {
 
                     <Link
                         to={"/editor"}
-                        className="hidden md:flex gap-2 link hover:rounded-md"
+                        className="hidden md:flex gap-2 link"
                     >
-                        <p>Write</p>
                         <i className="fi fi-rr-file-edit"></i>
+                        <p>Write</p>
                     </Link>
 
                     <button

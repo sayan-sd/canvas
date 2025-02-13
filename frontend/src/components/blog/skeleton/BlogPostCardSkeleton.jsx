@@ -2,32 +2,42 @@ import React from "react";
 
 const BlogPostCardSkeleton = () => {
     return (
-        <div className="flex gap-8 items-center border-b border-grey pb-5 mb-4 animate-pulse">
-            {/* Skeleton for blog content */}
-            <div className="w-full">
-                {/* Skeleton for username + published at */}
-                <div className="flex gap-2 items-center mb-7">
-                    <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
-                    <div className="h-4 w-32 bg-gray-300 rounded-md"></div>
-                    <div className="h-4 w-16 bg-gray-300 rounded-md"></div>
+        <div className="block rounded-lg bg-white shadow-md overflow-hidden mb-6 animate-pulse">
+            <div className="flex flex-row max-sm:flex-col md:max-[1100px]:flex-col">
+                {/* Skeleton for Blog Banner */}
+                <div className="w-1/3 max-sm:w-full md:max-[1100px]:w-full">
+                    <div className="relative h-full max-sm:h-48 md:max-[1100px]:h-48 bg-gray-300"></div>
                 </div>
 
-                {/* Skeleton for title */}
-                <div className="h-6 w-3/4 bg-gray-300 rounded-md mb-3"></div>
+                {/* Skeleton for Blog Content */}
+                <div className="w-2/3 max-sm:w-full md:max-[1100px]:w-full p-4 sm:py-4 sm:px-6">
+                    {/* Skeleton for Author Info & Date */}
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                        <div className="flex-1">
+                            <div className="h-4 w-24 bg-gray-300 rounded-md mb-1"></div>
+                            <div className="h-3 w-16 bg-gray-300 rounded-md"></div>
+                        </div>
+                    </div>
 
-                {/* Skeleton for blog description */}
-                <div className="h-4 w-full bg-gray-300 rounded-md mb-2"></div>
-                <div className="h-4 w-5/6 bg-gray-300 rounded-md"></div>
+                    {/* Skeleton for Title */}
+                    <div className="h-6 w-3/4 bg-gray-300 rounded-md mb-6"></div>
 
-                {/* Skeleton for tag & like count */}
-                <div className="flex gap-4 mt-7 items-center">
-                    <div className="h-6 w-16 bg-gray-300 rounded-md"></div>
-                    <div className="h-5 w-10 bg-gray-300 rounded-md"></div>
+                    {/* Skeleton for Description */}
+                    <div className="h-4 w-full bg-gray-300 rounded-md mb-2"></div>
+                    <div className="h-4 w-5/6 bg-gray-300 rounded-md"></div>
+
+                    {/* Skeleton for Engagement Stats */}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-dark-grey mt-4">
+                        <div className="flex items-center gap-5">
+                            <div className="h-5 w-10 bg-gray-300 rounded-md"></div>
+                            <div className="h-5 w-10 bg-gray-300 rounded-md"></div>
+                        </div>
+
+                        <div className="h-5 w-5 bg-gray-300 rounded-md"></div>
+                    </div>
                 </div>
             </div>
-
-            {/* Skeleton for blog banner */}
-            <div className="h-28 aspect-square bg-gray-300 rounded-md"></div>
         </div>
     );
 };

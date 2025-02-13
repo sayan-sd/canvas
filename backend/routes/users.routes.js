@@ -1,5 +1,5 @@
 const express = require('express');
-const { getSearchUsers, getUserProfile, changePassword, changeProfileImage, updateUserDetails, getNewNotifications, getNotifications, getNotificationsCount, getUserWrittenBlogs, getUserWrittenBlogsCount, deleteBlog } = require('../controllers/user');
+const { getSearchUsers, getUserProfile, changePassword, changeProfileImage, updateUserDetails, getNewNotifications, getNotifications, getNotificationsCount, getUserWrittenBlogs, getUserWrittenBlogsCount, deleteBlog, getWhomeToFollow, toggleBookmark, getBookmarkedBlogs } = require('../controllers/user');
 const { verifyUser } = require('../controllers/auth');
 const router = express.Router();
 
@@ -18,5 +18,10 @@ router.post('/all-notifications-count', verifyUser, getNotificationsCount);
 router.post('/user-written-blogs', verifyUser, getUserWrittenBlogs);
 router.post('/user-written-blogs-count', verifyUser, getUserWrittenBlogsCount);
 router.post('/delete-blog', verifyUser, deleteBlog);
+
+router.get('/whom-to-follow', getWhomeToFollow);
+
+router.post('/toggle-bookmark', verifyUser, toggleBookmark);
+router.post('/bookmarks', verifyUser, getBookmarkedBlogs);
 
 module.exports = router;

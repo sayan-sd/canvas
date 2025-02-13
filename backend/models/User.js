@@ -118,6 +118,11 @@ const UserSchema = new Schema(
             ref: "Blog",
             default: [],
         },
+        bookmarks: {
+            type: [Schema.Types.ObjectId],
+            ref: "Blog",
+            default: []
+        },
         resetToken: { type: String, default: undefined },
         tokenExpiry: { type: Date, default: undefined },
     },
