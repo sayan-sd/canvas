@@ -101,7 +101,7 @@ const BlogPostCard = ({ content, author }) => {
                     <p className="text-dark-grey mb-3 line-clamp-2">{des}</p>
     
                     {/* Engagement Stats */}
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-dark-grey">
+                    <div className="flex items-center justify-between pt-3 border-t border-dark-grey/20 text-dark-grey">
                         <div className="flex items-center gap-5">
                             <span className="flex items-center gap-2">
                                 <i className="fi fi-sr-heart text-xl"></i>

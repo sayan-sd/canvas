@@ -100,7 +100,7 @@ const SideNav = () => {
                                 onClick={(e) =>
                                     setPageState(e.target.innerText)
                                 }
-                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-grey transition duration-200"
                             >
                                 <i className="fi fi-rr-document mr-3"></i>
                                 Blogs
@@ -111,7 +111,7 @@ const SideNav = () => {
                                 onClick={(e) =>
                                     setPageState(e.target.innerText)
                                 }
-                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200 relative"
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-grey transition duration-200 relative"
                             >
                                 <i className="fi fi-rr-bell mr-3"></i>
                                 Notifications
@@ -125,7 +125,7 @@ const SideNav = () => {
                                 onClick={(e) =>
                                     setPageState(e.target.innerText)
                                 }
-                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-grey transition duration-200"
                             >
                                 <i className="fi fi-rr-book-bookmark mr-3"></i>
                                 Bookmarks
@@ -136,7 +136,7 @@ const SideNav = () => {
                                 onClick={(e) =>
                                     setPageState(e.target.innerText)
                                 }
-                                className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                className="sidebar-link flex items-center p-3 rounded hover:bg-grey transition duration-200"
                             >
                                 <i className="fi fi-rr-file-edit mr-3"></i>
                                 Write
@@ -153,7 +153,7 @@ const SideNav = () => {
                                     onClick={(e) =>
                                         setPageState(e.target.innerText)
                                     }
-                                    className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    className="sidebar-link flex items-center p-3 rounded hover:bg-grey transition duration-200"
                                 >
                                     <i className="fi fi-rr-user mr-3"></i>
                                     Edit Profile
@@ -164,7 +164,7 @@ const SideNav = () => {
                                     onClick={(e) =>
                                         setPageState(e.target.innerText)
                                     }
-                                    className="sidebar-link flex items-center p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    className="sidebar-link flex items-center p-3 rounded hover:bg-grey transition duration-200"
                                 >
                                     <i className="fi fi-rr-lock mr-3"></i>
                                     Change Password
@@ -226,7 +226,7 @@ const SideNav = () => {
                                         setPageState(e.target.innerText);
                                         setShowSideNav(false);
                                     }}
-                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    className="sidebar-link block p-3 rounded hover:bg-grey transition duration-200"
                                 >
                                     <i className="fi fi-rr-document mr-3"></i>
                                     Blogs
@@ -238,7 +238,7 @@ const SideNav = () => {
                                         setPageState(e.target.innerText);
                                         setShowSideNav(false);
                                     }}
-                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200 relative"
+                                    className="sidebar-link block p-3 rounded hover:bg-grey transition duration-200 relative"
                                 >
                                     <i className="fi fi-rr-bell mr-3"></i>
                                     Notifications
@@ -253,7 +253,7 @@ const SideNav = () => {
                                         setPageState(e.target.innerText);
                                         setShowSideNav(false);
                                     }}
-                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    className="sidebar-link block p-3 rounded hover:bg-grey transition duration-200"
                                 >
                                     <i className="fi fi-rr-book-bookmark mr-3"></i>
                                     Bookmarks
@@ -265,7 +265,7 @@ const SideNav = () => {
                                         setPageState(e.target.innerText);
                                         setShowSideNav(false);
                                     }}
-                                    className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                    className="sidebar-link block p-3 rounded hover:bg-grey transition duration-200"
                                 >
                                     <i className="fi fi-rr-file-edit mr-3"></i>
                                     Write
@@ -285,7 +285,7 @@ const SideNav = () => {
                                             setPageState(e.target.innerText);
                                             setShowSideNav(false);
                                         }}
-                                        className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                        className="sidebar-link block p-3 rounded hover:bg-grey transition duration-200"
                                     >
                                         <i className="fi fi-rr-user mr-3"></i>
                                         Edit Profile
@@ -297,7 +297,7 @@ const SideNav = () => {
                                             setPageState(e.target.innerText);
                                             setShowSideNav(false);
                                         }}
-                                        className="sidebar-link block p-3 rounded hover:bg-gray-100 transition duration-200"
+                                        className="sidebar-link block p-3 rounded hover:bg-grey transition duration-200"
                                     >
                                         <i className="fi fi-rr-lock mr-3"></i>
                                         Change Password

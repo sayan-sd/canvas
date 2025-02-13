@@ -39,7 +39,7 @@ export default {
                 'black': "#F3F3F3",
                 'grey': "#2A2A2A",
                 'dark-grey': "#E7E7E7",
-                'red': "#991F1F",
+                'red': "#AA1F1F",
                 'transparent': "transparent",
                 'twitter': "#0E71A8",
                 'purple': "#d52ab8",

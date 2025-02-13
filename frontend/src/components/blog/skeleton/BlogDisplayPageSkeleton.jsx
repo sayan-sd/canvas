@@ -1,57 +1,56 @@
 import React from "react";
-import PageAnimationWrapper from "../../common/PageAnimation";
 
 const BlogDisplayPageSkeleton = () => {
     return (
-        <div className="max-w-[900px] center py-10 max-lg:px-[5vw] animate-pulse">
-            {/* banner */}
-            <div className="w-full aspect-video bg-gray-300 rounded-md" />
-
-            {/* title + user details */}
-            <div className="mt-12">
-                {/* title */}
-                <div className="h-12 w-full bg-gray-300 rounded-md mb-4" />
-                <div className="h-12 w-3/4 bg-gray-300 rounded-md mb-4" />
-
-                {/* user details */}
-                <div className="flex gap-5 items-start my-8">
-                    <div className="w-12 h-12 bg-gray-300 rounded-full" />
-                    <div>
-                        <div className="w-32 h-6 bg-gray-300 rounded-md" />
-                        <div className="w-20 h-4 bg-gray-300 rounded-md mt-2" />
-                    </div>
-
+        <div className="animate-pulse min-h-screen">
+            <div className="max-w-5xl mx-auto py-12 px-6 pt-16">
+                {/* Title & Description */}
+                <div className="mb-8 text-center">
+                    <div className="h-8 bg-gray-300 rounded w-2/3 mx-auto mb-7"></div>
+                    <div className="h-4 bg-gray-300 rounded w-4/5 mx-auto mb-2"></div>
+                    <div className="h-4 bg-gray-300 rounded w-3/5 mx-auto"></div>
                 </div>
-                {/* published - sm */}
-                <div className="w-2/5 max-sm:h-4 bg-gray-300 rounded-md ml-16 mb-10"/>
 
-                {/* interaction */}
-                <div className="w-full h-10 md:h16 bg-gray-300 rounded-md" />
+                {/* Banner Image */}
+                <div className="w-full h-[400px] bg-gray-300 rounded-lg mb-8"></div>
+
+                {/* Author & Publication Details */}
+                <div className="flex max-sm:flex-col justify-between my-10">
+                    <div className="flex gap-5 items-center">
+                        <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+                        <div>
+                            <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                            <div className="h-3 bg-gray-300 rounded w-16"></div>
+                        </div>
+                    </div>
+                    <div className="h-3 bg-gray-300 rounded w-32 max-sm:mt-6"></div>
+                </div>
+
+                {/* Blog Interaction (Top) */}
+                <div className="h-10 bg-gray-300 rounded w-full mb-10"></div>
+
+                {/* Blog Content */}
+                <div className="space-y-4 mb-8">
+                    <div className="h-6 bg-gray-300 rounded w-full"></div>
+                    <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+                    <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                    <div className="h-6 bg-gray-300 rounded w-full"></div>
+                    <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+                    <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+                </div>
+
+                <div className="space-y-4">
+                    <div className="h-6 bg-gray-300 rounded w-full"></div>
+                    <div className="h-6 bg-gray-300 rounded w-5/6"></div>
+                    <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+                </div>
+
+                {/* Blog Interaction (Bottom) */}
+                <div className="h-10 bg-gray-300 rounded w-full my-10"></div>
             </div>
-
-            {/* content */}
-            <div className="my-12 mb-20">
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-3/4 h-6 bg-gray-300 rounded-md mb-12" />
-
-                <div className="w-3/4 lg:w-1/2 h-10 bg-gray-300 rounded-md mb-6" />
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-5/6 h-6 bg-gray-300 rounded-md mb-4" />
-
-                {/* image */}
-                <div className="w-[96%] h-80 bg-gray-300 rounded-md mt-12 mx-auto" />
-                <div className="w-36 h-4 bg-gray-300 rounded-md my-4 mx-auto mb-12" />
-
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-full h-6 bg-gray-300 rounded-md mb-4" />
-                <div className="w-2/3 h-6 bg-gray-300 rounded-md mb-4" />
-            </div>
-
-            {/* intraction */}
-            <div className="w-full h-10 md:h-16 bg-gray-300 rounded-md my-8" />
         </div>
     );
 };

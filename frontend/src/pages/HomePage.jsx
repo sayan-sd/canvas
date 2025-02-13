@@ -100,7 +100,7 @@ const HomePage = () => {
         if (
             !loading &&
             blogs?.totalDocs > blogs?.results.length &&
-            scrollTop + clientHeight >= scrollHeight - 100
+            scrollTop + clientHeight >= scrollHeight - 10
             // scrollTop + clientHeight >= scrollHeight - 500
         ) {
             const nextPage = blogs.page + 1;
@@ -153,7 +153,6 @@ const HomePage = () => {
         <PageAnimationWrapper>
             <section className="h-cover flex flex-col md:flex-row justify-center gap-5 md:gap-10 pt-5">
                 {/* categories for small devices */}
-                {/* categories (tags) */}
                 <div className="w-full overflow-x-auto no-scrollbar md:hidden">
                     <div className="flex gap-3 whitespace-nowrap">
                         {categories.map((category, i) => {
