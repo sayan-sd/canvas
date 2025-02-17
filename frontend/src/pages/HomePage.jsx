@@ -151,9 +151,9 @@ const HomePage = () => {
 
     return (
         <PageAnimationWrapper>
-            <section className="h-cover flex flex-col md:flex-row justify-center gap-5 md:gap-10 pt-5">
+            <section className="h-cover flex flex-col md:flex-row gap-5 md:gap-10 pt-5">
                 {/* categories for small devices */}
-                <div className="w-full overflow-x-auto no-scrollbar md:hidden">
+                <div className="w-full overflow-x-auto no-scrollbar md:hidden mb-2">
                     <div className="flex gap-3 whitespace-nowrap">
                         {categories.map((category, i) => {
                             return (
