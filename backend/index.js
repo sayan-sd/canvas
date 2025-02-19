@@ -34,6 +34,9 @@ app.use("/editor", editorRoutes);
 app.use("/blogs", blogRoutes);
 app.use("/users", userRoutes);
 
+app.get("/test", (req, res) => {
+    res.send("Welcome to Canvas Buddy...");
+})
 
 
 app.listen(3000);
