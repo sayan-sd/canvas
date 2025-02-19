@@ -38,5 +38,5 @@ app.get("/test", (req, res) => {
     res.send("Welcome to Canvas Buddy...");
 })
 
-module.exports = app;
+
 app.listen(3000);
