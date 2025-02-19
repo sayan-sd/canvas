@@ -104,6 +104,7 @@ const ManageBlogs = () => {
             <InpageNavigation
                 routes={["Published Blogs", "Drafts"]}
                 defaultActiveIndex={activeTab != "draft" ? 0 : 1}
+                icons={["fi-rr-inbox-in", "fi-rr-file"]}
             >
                 {/* published blogs */}
                 {blogs == null ? (

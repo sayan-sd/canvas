@@ -30,8 +30,7 @@ const BlogDisplayPage = () => {
     const [similarBlogs, setSimilarBlogs] = useState(null);
     const [isLikedByUser, setIsLikedByUser] = useState(false);
     const [commentsWrapper, setCommentsWrapper] = useState(false);
-    const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] =
-        useState(0);
+    const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
     const navigate = useNavigate();
 
     let {
