@@ -8,7 +8,7 @@ Canvas is a fully responsive MERN stack blogging platform where users can write,
 
 ## 📌 Table of Contents
 - [Features](#-features)
-- [Demo Video](#-demo)
+- [Demo Video](#-demo-video)
 - [Installation & Setup](#-installation--setup)
 - [Environment Variables](#-environment-variables)
 - [Tech Stack](#-tech-stack)
@@ -68,7 +68,7 @@ Canvas is a fully responsive MERN stack blogging platform where users can write,
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/canvas.git
+git clone https://github.com/sayan-sd/canvas.git
 
 # Navigate to the project folder
 cd canvas
@@ -106,5 +106,5 @@ To run this project, follow the ***.env.example*** in both **frontend** and **ba
 
 **LinkedIn:** [LinkedIn Profile](https://www.linkedin.com/in/sayan-sd)
 
-#### Made with ❤️ by [Sayan Das](https://github.com/sayan-sd)
+#### Made with ❤️ by [Sayan](https://github.com/sayan-sd)
 
