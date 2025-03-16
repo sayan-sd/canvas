@@ -34,8 +34,12 @@ app.use("/editor", editorRoutes);
 app.use("/blogs", blogRoutes);
 app.use("/users", userRoutes);
 
-app.get("/test", (req, res) => {
+app.get("/", (req, res) => {
     res.send("Welcome to Canvas Buddy...");
+})
+
+app.get("/favicon.ico", (req, res) => {
+    res.send("This is hosted via Vercel")
 })
 
 
